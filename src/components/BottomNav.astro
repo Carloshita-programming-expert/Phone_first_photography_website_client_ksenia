@@ -1,0 +1,142 @@
+---
+import { Home, Grid, User } from 'lucide-astro';
+
+interface Props {
+  currentLang?: 'en' | 'ru';
+  activeTab?: 'home' | 'grid' | 'about';
+}
+
+const { currentLang = 'en', activeTab = 'home' } = Astro.props;
+---
+
+<nav
+  class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[470px] z-50 bg-neutral-950/85 backdrop-blur-xl border-t border-neutral-800/70 px-6 py-2.5 transition-all duration-300"
+  aria-label="Bottom Navigation"
+>
+  <div class="flex items-center justify-between">
+    <!-- Home Tab -->
+    <a
+      href="/"
+      id="nav-home"
+      class={`flex flex-col items-center gap-1 py-1 transition-colors ${
+        activeTab === 'home' ? 'text-white' : 'text-neutral-400 hover:text-neutral-200'
+      }`}
+      aria-label="Home Feed"
+    >
+      <Home class="w-6 h-6 stroke-[1.75]" />
+      <span class="text-[10px] font-medium tracking-tight">Feed</span>
+    </a>
+
+    <!-- Grid / Gallery Tab -->
+    <a
+      href="#grid"
+      id="nav-grid"
+      class={`flex flex-col items-center gap-1 py-1 transition-colors ${
+        activeTab === 'grid' ? 'text-white' : 'text-neutral-400 hover:text-neutral-200'
+      }`}
+      aria-label="Photoshoot Grid"
+    >
+      <Grid class="w-6 h-6 stroke-[1.75]" />
+      <span class="text-[10px] font-medium tracking-tight">Grid</span>
+    </a>
+
+    <!-- About Tab -->
+    <a
+      href="#about"
+      id="nav-about"
+      class={`flex flex-col items-center gap-1 py-1 transition-colors ${
+        activeTab === 'about' ? 'text-white' : 'text-neutral-400 hover:text-neutral-200'
+      }`}
+      aria-label="About Photographer"
+    >
+      <User class="w-6 h-6 stroke-[1.75]" />
+      <span class="text-[10px] font-medium tracking-tight">About</span>
+    </a>
+
+    <!-- Language Toggle (EN / RU) -->
+    <div
+      class="flex items-center bg-neutral-900 border border-neutral-800 rounded-full p-0.5 text-[11px] font-semibold text-neutral-400"
+      role="group"
+      aria-label="Language Selector"
+    >
+      <button
+        type="button"
+        data-lang-btn="en"
+        class={`lang-toggle-btn px-2.5 py-1 rounded-full transition-all duration-200 ${
+          currentLang === 'en'
+            ? 'bg-neutral-100 text-black shadow-sm'
+            : 'text-neutral-400 hover:text-white'
+        }`}
+        aria-pressed={currentLang === 'en' ? 'true' : 'false'}
+      >
+        EN
+      </button>
+      <button
+        type="button"
+        data-lang-btn="ru"
+        class={`lang-toggle-btn px-2.5 py-1 rounded-full transition-all duration-200 ${
+          currentLang === 'ru'
+            ? 'bg-neutral-100 text-black shadow-sm'
+            : 'text-neutral-400 hover:text-white'
+        }`}
+        aria-pressed={currentLang === 'ru' ? 'true' : 'false'}
+      >
+        RU
+      </button>
+    </div>
+  </div>
+</nav>
+
+<script>
+  // Lightweight client-side toggle for instant zero-reload language switching
+  // Syncs with data attributes across FeedPost caption containers
+  function setupLanguageToggle() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-lang-btn]');
+    const url = new URL(window.location.href);
+    const initialLang = url.searchParams.get('lang') || 'en';
+
+    function setLanguage(lang: 'en' | 'ru') {
+      // Update toggle buttons active styles
+      buttons.forEach((btn) => {
+        const btnLang = btn.getAttribute('data-lang-btn');
+        const isActive = btnLang === lang;
+        btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        if (isActive) {
+          btn.className = 'lang-toggle-btn px-2.5 py-1 rounded-full transition-all duration-200 bg-neutral-100 text-black shadow-sm';
+        } else {
+          btn.className = 'lang-toggle-btn px-2.5 py-1 rounded-full transition-all duration-200 text-neutral-400 hover:text-white';
+        }
+      });
+
+      // Update feed caption visibility
+      document.querySelectorAll('[data-caption-lang]').forEach((el) => {
+        const itemLang = el.getAttribute('data-caption-lang');
+        if (itemLang === lang) {
+          el.classList.remove('hidden');
+        } else {
+          el.classList.add('hidden');
+        }
+      });
+
+      // Keep query param in sync for bookmarking
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.set('lang', lang);
+      window.history.replaceState({}, '', currentUrl.toString());
+    }
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const selected = btn.getAttribute('data-lang-btn') as 'en' | 'ru';
+        if (selected) setLanguage(selected);
+      });
+    });
+
+    if (initialLang === 'ru') {
+      setLanguage('ru');
+    }
+  }
+
+  // Initialize on page load
+  setupLanguageToggle();
+  document.addEventListener('astro:page-load', setupLanguageToggle);
+</script>

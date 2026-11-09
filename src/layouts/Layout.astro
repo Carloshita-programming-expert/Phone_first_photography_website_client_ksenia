@@ -1,0 +1,66 @@
+---
+import '../styles/global.css';
+import BottomNav from '../components/BottomNav.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  currentLang?: 'en' | 'ru';
+}
+
+const {
+  title = 'Visual Stories | Photography Portfolio',
+  description = 'High-end mobile-first photography portfolio featuring curated shoots.',
+  currentLang = 'en',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang={currentLang} class="bg-[#050505] text-neutral-100 antialiased">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#000000" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen bg-gradient-to-br from-[#0c0d12] via-[#050505] to-[#08080a] flex justify-center text-neutral-100 overflow-x-hidden selection:bg-neutral-800 selection:text-white">
+    <!-- Desktop Ambient Background Elements -->
+    <div class="fixed inset-0 pointer-events-none hidden md:block overflow-hidden">
+      <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-gradient-to-b from-neutral-800/20 via-neutral-900/10 to-transparent blur-3xl opacity-50 rounded-full"></div>
+      <div class="absolute bottom-10 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-neutral-900/20 blur-3xl rounded-full"></div>
+    </div>
+
+    <!-- Centered Mobile Column Constraint (max-w-[470px] permanently enforced) -->
+    <div class="w-full max-w-[470px] min-h-screen bg-black border-x border-neutral-800/60 shadow-[0_0_50px_rgba(0,0,0,0.85)] relative flex flex-col justify-between">
+      
+      <!-- Top Mobile Navigation Header -->
+      <header class="sticky top-0 z-40 bg-black/85 backdrop-blur-md border-b border-neutral-900 px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <span class="font-serif tracking-wider text-sm uppercase font-semibold text-neutral-100">
+            Portfolio
+          </span>
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        </div>
+        <div class="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
+          Curated Works
+        </div>
+      </header>
+
+      <!-- Main Mobile Scroll Area -->
+      <main class="flex-1 w-full pb-20">
+        <slot />
+      </main>
+
+      <!-- Fixed Bottom Navigation (strictly pinned to bottom of 470px column) -->
+      <BottomNav currentLang={currentLang} />
+    </div>
+  </body>
+</html>

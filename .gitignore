@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Production build output
+dist/
+.astro/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Raw image binaries strictly prohibited in repo
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.avif
+*.heic
+*.tiff
+*.raw
+*.cr2
+*.nef
+*.arw
+!public/favicon.svg
