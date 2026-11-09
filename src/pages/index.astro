@@ -1,27 +1,28 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import FeedPost from '../components/FeedPost.astro';
+import feedData from '../data/feed.json';
 
-const mockPost = {
-  id: 'editorial-01',
-  title: 'Nocturnal Reverie',
-  location: 'Kyoto, Japan',
-  images: [
-    'samples/landscapes/nature-mountains',
-    'samples/landscapes/beach-boat',
-    'samples/animals/kitten-playing'
-  ],
-  captions: {
-    en: 'Shadows folding over the traditional machiya alleys at twilight. Shot on CineStill 800T.',
-    ru: 'Тени, опускающиеся на традиционные улочки матиа в сумерках. Снято на CineStill 800T.'
-  },
-  date: 'October 2026',
-  camera: 'Leica M6 · 35mm'
-};
+const currentLang = (Astro.url.searchParams.get('lang') as 'en' | 'ru') || 'en';
 ---
 
-<Layout title="Visual Stories | Mobile Portfolio">
-  <div class="w-full">
-    <FeedPost {...mockPost} />
-  </div>
+<Layout
+  title="Visual Stories | Mobile Photography Portfolio"
+  description="Curated high-end photography portfolio featuring stories from Kyoto, Iceland, Berlin, Almaty, and Milos."
+  currentLang={currentLang}
+>
+  <section class="w-full flex flex-col" aria-label="Photography Feed">
+    {feedData.map((post, index) => (
+      <FeedPost
+        id={post.id}
+        title={post.title}
+        location={post.location}
+        camera={post.camera}
+        date={post.date}
+        images={post.images}
+        captions={post.captions}
+        isFirstPost={index === 0}
+      />
+    ))}
+  </section>
 </Layout>

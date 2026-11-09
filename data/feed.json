@@ -1,0 +1,82 @@
+[
+  {
+    "id": "kyoto-nocturne",
+    "title": "Nocturnal Reverie",
+    "location": "Kyoto, Japan",
+    "camera": "Leica M6 · CineStill 800T",
+    "date": "October 2026",
+    "images": [
+      "samples/landscapes/nature-mountains",
+      "samples/landscapes/beach-boat",
+      "samples/landscapes/architecture-signs"
+    ],
+    "captions": {
+      "en": "Twilight settling over the wooden Machiya alleys of Gion. Cyan neon bleeding through paper lantern shadows.",
+      "ru": "Сумерки, опускающиеся на деревянные улочки матиа в Гионе. Бирюзовый неон, пробивающийся сквозь тени бумажных фонарей."
+    }
+  },
+  {
+    "id": "iceland-solitude",
+    "title": "Glacial Monoliths",
+    "location": "Vík í Mýrdal, Iceland",
+    "camera": "Hasselblad 500C/M · Kodak Tri-X 400",
+    "date": "September 2026",
+    "images": [
+      "cld-sample-2",
+      "cld-sample-3",
+      "samples/bike"
+    ],
+    "captions": {
+      "en": "Volcanic black sands meeting the raw Atlantic froth. High contrast monochrome studies along the Reynisfjara shoreline.",
+      "ru": "Вулканический черный песок, встречающийся с бурной атлантической пеной. Высококонтрастные монохромные зарисовки побережья Рейнисфьяра."
+    }
+  },
+  {
+    "id": "berlin-brutalism",
+    "title": "Geometric Solitude",
+    "location": "Berlin, Germany",
+    "camera": "Contax T2 · Ilford HP5 Plus",
+    "date": "August 2026",
+    "images": [
+      "samples/landscapes/architecture-signs",
+      "cld-sample-4",
+      "samples/people/boy-snow-hoodie"
+    ],
+    "captions": {
+      "en": "Cold angles and monolithic concrete geometry awakening in the early Kreuzberg dawn fog.",
+      "ru": "Холодные углы и монолитная геометрия бетона, пробуждающаяся в раннем рассветном тумане Кройцберга."
+    }
+  },
+  {
+    "id": "almaty-steppe",
+    "title": "Tian Shan Crests",
+    "location": "Almaty, Kazakhstan",
+    "camera": "Mamiya 7II · Fuji Pro 400H",
+    "date": "July 2026",
+    "images": [
+      "samples/landscapes/nature-mountains",
+      "cld-sample-5",
+      "samples/people/smiling-man"
+    ],
+    "captions": {
+      "en": "Golden hour spilling across the alpine spruce ridges above Medeu before descending into the vast southern steppe.",
+      "ru": "Золотой час, заливающий хребты тянь-шаньских елей над Медеу перед спуском в бескрайнюю южную степь."
+    }
+  },
+  {
+    "id": "aegean-chalk",
+    "title": "Lunar Coastlines",
+    "location": "Milos, Greece",
+    "camera": "Pentax 67 · Kodak Portra 160",
+    "date": "June 2026",
+    "images": [
+      "cld-sample",
+      "samples/food/dessert",
+      "samples/landscapes/beach-boat"
+    ],
+    "captions": {
+      "en": "Bleached limestone arches sculpted by millenniums of salt and mist against deep Aegean ultramarine.",
+      "ru": "Выбеленные известняковые арки, веками обтесанные солью и туманом, на фоне глубокого эгейского ультрамарина."
+    }
+  }
+]
