@@ -1,0 +1,244 @@
+---
+import { MapPin, Camera, Heart, Share2 } from 'lucide-astro';
+import { getCloudinaryUrl } from '../utils/cloudinary';
+
+export interface Captions {
+  en: string;
+  ru: string;
+}
+
+export interface Props {
+  id: string | number;
+  title: string;
+  location: string;
+  images: string[];
+  captions: Captions;
+  date?: string;
+  camera?: string;
+}
+
+const {
+  id,
+  title,
+  location,
+  images = [],
+  captions = { en: '', ru: '' },
+  date = 'Recent Series',
+  camera = '35mm Film',
+} = Astro.props;
+
+const postId = `post-${id}`;
+---
+
+<article class="w-full border-b border-neutral-900/80 pb-6 mb-6 bg-black text-neutral-100" id={postId}>
+  <!-- Post Header: Photoshoot Title & Location -->
+  <header class="px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <!-- Minimalist Photographer Monogram / Series Tag -->
+      <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-neutral-800 to-neutral-700 p-[1.5px] flex items-center justify-center shadow-md">
+        <div class="w-full h-full rounded-full bg-black flex items-center justify-center">
+          <Camera class="w-4 h-4 text-neutral-300 stroke-[1.75]" />
+        </div>
+      </div>
+
+      <!-- Title & Location -->
+      <div class="flex flex-col">
+        <h2 class="text-sm font-semibold tracking-tight text-white leading-tight">
+          {title}
+        </h2>
+        <div class="flex items-center space-x-1 text-xs text-neutral-400 mt-0.5">
+          <MapPin class="w-3.5 h-3.5 text-neutral-500 stroke-[2]" />
+          <span class="tracking-tight text-[11px] text-neutral-300 font-medium">{location}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Series metadata tag -->
+    <div class="text-[10px] uppercase font-mono tracking-wider px-2 py-0.5 rounded bg-neutral-900 text-neutral-400 border border-neutral-800">
+      {camera}
+    </div>
+  </header>
+
+  <!-- Image Gallery: Pure CSS Scroll-Snap Carousel Container -->
+  <div class="relative w-full aspect-[4/5] bg-neutral-950 overflow-hidden select-none">
+    <div
+      class="feed-carousel flex w-full h-full overflow-x-auto snap-x-mandatory no-scrollbar scroll-smooth"
+      data-carousel={postId}
+      tabindex="0"
+      aria-label={`${title} image gallery`}
+    >
+      {images.map((imgId, index) => (
+        <div
+          class="flex-shrink-0 w-full h-full snap-center-item relative bg-neutral-950 flex items-center justify-center overflow-hidden"
+          data-slide-index={index}
+        >
+          <img
+            src={getCloudinaryUrl(imgId, 'f_auto,q_auto,w_1080,c_limit')}
+            alt={`${title} - Photograph ${index + 1}`}
+            loading={index === 0 ? 'eager' : 'lazy'}
+            decoding="async"
+            class="w-full h-full object-cover transition-transform duration-500 ease-out pointer-events-none"
+          />
+        </div>
+      ))}
+    </div>
+
+    <!-- Top-right Photo Counter Badge (e.g. 1/3) -->
+    {images.length > 1 && (
+      <div class="absolute top-3 right-3 bg-black/60 backdrop-blur-md px-2.5 py-0.5 rounded-full text-[10px] font-mono tracking-wider text-neutral-200 border border-white/10 z-10 pointer-events-none">
+        <span data-counter-current={postId}>1</span>/{images.length}
+      </div>
+    )}
+  </div>
+
+  <!-- Post Controls & Dynamic Dot Pagination -->
+  <div class="px-4 pt-3 flex items-center justify-between">
+    <!-- Action Icons (Instagram Style) -->
+    <div class="flex items-center space-x-4 text-neutral-300">
+      <button
+        type="button"
+        class="heart-btn hover:text-rose-500 transition-colors p-1 -m-1 focus:outline-none"
+        aria-label="Appreciate series"
+      >
+        <Heart class="w-5 h-5 stroke-[1.75]" />
+      </button>
+      <button
+        type="button"
+        class="share-btn hover:text-white transition-colors p-1 -m-1 focus:outline-none"
+        aria-label="Share photoshoot"
+        data-share-title={title}
+      >
+        <Share2 class="w-5 h-5 stroke-[1.75]" />
+      </button>
+    </div>
+
+    <!-- Dynamic Dot Indicators reflecting carousel length -->
+    {images.length > 1 && (
+      <div
+        class="flex items-center justify-center space-x-1.5"
+        role="tablist"
+        aria-label="Slide indicators"
+        data-dots-container={postId}
+      >
+        {images.map((_, i) => (
+          <button
+            type="button"
+            class={`carousel-dot h-1.5 rounded-full transition-all duration-300 ${
+              i === 0 ? 'w-4 bg-white' : 'w-1.5 bg-neutral-600 hover:bg-neutral-500'
+            }`}
+            data-dot-post={postId}
+            data-dot-index={i}
+            aria-label={`Go to slide ${i + 1}`}
+            role="tab"
+            aria-selected={i === 0 ? 'true' : 'false'}
+          />
+        ))}
+      </div>
+    )}
+
+    <!-- Date tag -->
+    <div class="text-[11px] font-medium text-neutral-500">
+      {date}
+    </div>
+  </div>
+
+  <!-- Bilingual Captions Section -->
+  <div class="px-4 pt-2.5">
+    <!-- English Caption -->
+    <div data-caption-lang="en" class="text-xs text-neutral-300 leading-relaxed">
+      <span class="font-semibold text-white mr-1.5">{title}</span>
+      <span>{captions.en}</span>
+    </div>
+
+    <!-- Russian Caption -->
+    <div data-caption-lang="ru" class="text-xs text-neutral-300 leading-relaxed hidden">
+      <span class="font-semibold text-white mr-1.5">{title}</span>
+      <span>{captions.ru}</span>
+    </div>
+  </div>
+</article>
+
+<script>
+  // Pure lightweight carousel observer for active dot pagination & click-to-scroll
+  function setupCarousels() {
+    const carousels = document.querySelectorAll<HTMLElement>('[data-carousel]');
+
+    carousels.forEach((carousel) => {
+      const postId = carousel.getAttribute('data-carousel');
+      if (!postId) return;
+
+      const dots = document.querySelectorAll<HTMLElement>(`[data-dot-post="${postId}"]`);
+      const counterEl = document.querySelector<HTMLElement>(`[data-counter-current="${postId}"]`);
+
+      // Track horizontal scroll position
+      let ticking = false;
+      carousel.addEventListener('scroll', () => {
+        if (!ticking) {
+          window.requestAnimationFrame(() => {
+            const slideWidth = carousel.clientWidth || 1;
+            const activeIndex = Math.round(carousel.scrollLeft / slideWidth);
+
+            // Update dot indicators
+            dots.forEach((dot, index) => {
+              const isActive = index === activeIndex;
+              dot.setAttribute('aria-selected', isActive ? 'true' : 'false');
+              if (isActive) {
+                dot.className = 'carousel-dot h-1.5 rounded-full transition-all duration-300 w-4 bg-white';
+              } else {
+                dot.className = 'carousel-dot h-1.5 rounded-full transition-all duration-300 w-1.5 bg-neutral-600 hover:bg-neutral-500';
+              }
+            });
+
+            // Update numerical counter
+            if (counterEl) {
+              counterEl.textContent = String(activeIndex + 1);
+            }
+
+            ticking = false;
+          });
+          ticking = true;
+        }
+      }, { passive: true });
+
+      // Enable dot click navigation
+      dots.forEach((dot) => {
+        dot.addEventListener('click', () => {
+          const targetIndex = Number(dot.getAttribute('data-dot-index'));
+          const slideWidth = carousel.clientWidth;
+          carousel.scrollTo({
+            left: targetIndex * slideWidth,
+            behavior: 'smooth',
+          });
+        });
+      });
+    });
+
+    // Native Web Share API integration if supported
+    document.querySelectorAll<HTMLButtonElement>('.share-btn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const title = btn.getAttribute('data-share-title') || document.title;
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: title,
+              url: window.location.href,
+            });
+          } catch {
+            // Ignore cancelation
+          }
+        }
+      });
+    });
+
+    // Interactive Heart toggle
+    document.querySelectorAll<HTMLButtonElement>('.heart-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        btn.classList.toggle('text-rose-500');
+        btn.classList.toggle('text-neutral-300');
+      });
+    });
+  }
+
+  setupCarousels();
+  document.addEventListener('astro:page-load', setupCarousels);
+</script>
