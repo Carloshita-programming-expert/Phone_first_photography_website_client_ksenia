@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import FeedPost from '../components/FeedPost.astro';
+import MasonryGrid from '../components/MasonryGrid.astro';
 import { client } from '../../tina/__generated__/client';
 
 const currentLang = (Astro.url.searchParams.get('lang') as 'en' | 'ru') || 'en';
@@ -10,11 +11,13 @@ const posts = response.data?.photoshootsConnection?.edges?.map((edge) => edge?.n
 ---
 
 <Layout
-  title="Visual Stories | Mobile Photography Portfolio"
+  title="Visual Stories | Photography Portfolio"
   description="Curated high-end photography portfolio featuring stories from Kyoto, Iceland, Berlin, Almaty, and Milos."
   currentLang={currentLang}
+  activeTab="home"
 >
-  <section class="w-full flex flex-col" aria-label="Photography Feed">
+  <!-- Mobile Viewport: Instagram-style vertical scroll-snap feed (block lg:hidden) -->
+  <section class="block lg:hidden w-full flex flex-col" aria-label="Mobile Photography Feed">
     {posts.map((post, index) => (
       <FeedPost
         id={post.id || post._sys?.filename}
@@ -30,5 +33,21 @@ const posts = response.data?.photoshootsConnection?.edges?.map((edge) => edge?.n
         isFirstPost={index === 0}
       />
     ))}
+  </section>
+
+  <!-- Desktop Override: Full-monitor masonry gallery (hidden lg:block) -->
+  <section class="hidden lg:block w-full px-4 sm:px-6" aria-label="Desktop Masonry Gallery">
+    <div class="mb-8 flex flex-col items-center text-center">
+      <span class="text-xs font-mono uppercase tracking-[0.3em] text-neutral-400">
+        Fine Art & Documentary
+      </span>
+      <h1 class="font-serif text-3xl xl:text-4xl text-neutral-100 tracking-tight font-normal mt-2">
+        Curated Photographic Works
+      </h1>
+      <p class="text-sm text-neutral-400 max-w-lg mx-auto mt-2 font-light leading-relaxed">
+        Analogue visual diaries capturing architectural form, shadow studies, and remote topographies across Kyoto, Iceland, Berlin, Almaty, and Milos.
+      </p>
+    </div>
+    <MasonryGrid posts={posts} />
   </section>
 </Layout>
