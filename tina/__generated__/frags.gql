@@ -1,6 +1,7 @@
 fragment PhotoshootsParts on Photoshoots {
   __typename
   title
+  title_ru
   location
   camera
   date
@@ -9,11 +10,11 @@ fragment PhotoshootsParts on Photoshoots {
   caption_ru
 }
 
-fragment ProfileParts on Profile {
+fragment Global_profileParts on Global_profile {
   __typename
   name
   bio_en
   bio_ru
   email
-  profile_image
+  portrait
 }

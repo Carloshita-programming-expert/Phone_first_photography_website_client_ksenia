@@ -86,8 +86,8 @@ export type Query = {
   document: DocumentNode;
   photoshoots: Photoshoots;
   photoshootsConnection: PhotoshootsConnection;
-  profile: Profile;
-  profileConnection: ProfileConnection;
+  global_profile: Global_Profile;
+  global_profileConnection: Global_ProfileConnection;
 };
 
 
@@ -127,23 +127,23 @@ export type QueryPhotoshootsConnectionArgs = {
 };
 
 
-export type QueryProfileArgs = {
+export type QueryGlobal_ProfileArgs = {
   relativePath?: InputMaybe<Scalars['String']['input']>;
 };
 
 
-export type QueryProfileConnectionArgs = {
+export type QueryGlobal_ProfileConnectionArgs = {
   before?: InputMaybe<Scalars['String']['input']>;
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Float']['input']>;
   last?: InputMaybe<Scalars['Float']['input']>;
   sort?: InputMaybe<Scalars['String']['input']>;
-  filter?: InputMaybe<ProfileFilter>;
+  filter?: InputMaybe<Global_ProfileFilter>;
 };
 
 export type DocumentFilter = {
   photoshoots?: InputMaybe<PhotoshootsFilter>;
-  profile?: InputMaybe<ProfileFilter>;
+  global_profile?: InputMaybe<Global_ProfileFilter>;
 };
 
 export type DocumentConnectionEdges = {
@@ -183,11 +183,12 @@ export type CollectionDocumentsArgs = {
   folder?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type DocumentNode = Photoshoots | Profile | Folder;
+export type DocumentNode = Photoshoots | Global_Profile | Folder;
 
 export type Photoshoots = Node & Document & {
   __typename?: 'Photoshoots';
   title: Scalars['String']['output'];
+  title_ru?: Maybe<Scalars['String']['output']>;
   location: Scalars['String']['output'];
   camera?: Maybe<Scalars['String']['output']>;
   date?: Maybe<Scalars['String']['output']>;
@@ -208,6 +209,7 @@ export type StringFilter = {
 
 export type PhotoshootsFilter = {
   title?: InputMaybe<StringFilter>;
+  title_ru?: InputMaybe<StringFilter>;
   location?: InputMaybe<StringFilter>;
   camera?: InputMaybe<StringFilter>;
   date?: InputMaybe<StringFilter>;
@@ -229,37 +231,37 @@ export type PhotoshootsConnection = Connection & {
   edges?: Maybe<Array<Maybe<PhotoshootsConnectionEdges>>>;
 };
 
-export type Profile = Node & Document & {
-  __typename?: 'Profile';
+export type Global_Profile = Node & Document & {
+  __typename?: 'Global_profile';
   name: Scalars['String']['output'];
   bio_en?: Maybe<Scalars['String']['output']>;
   bio_ru?: Maybe<Scalars['String']['output']>;
   email?: Maybe<Scalars['String']['output']>;
-  profile_image?: Maybe<Scalars['String']['output']>;
+  portrait?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   _sys: SystemInfo;
   _values: Scalars['JSON']['output'];
 };
 
-export type ProfileFilter = {
+export type Global_ProfileFilter = {
   name?: InputMaybe<StringFilter>;
   bio_en?: InputMaybe<StringFilter>;
   bio_ru?: InputMaybe<StringFilter>;
   email?: InputMaybe<StringFilter>;
-  profile_image?: InputMaybe<StringFilter>;
+  portrait?: InputMaybe<StringFilter>;
 };
 
-export type ProfileConnectionEdges = {
-  __typename?: 'ProfileConnectionEdges';
+export type Global_ProfileConnectionEdges = {
+  __typename?: 'Global_profileConnectionEdges';
   cursor: Scalars['String']['output'];
-  node?: Maybe<Profile>;
+  node?: Maybe<Global_Profile>;
 };
 
-export type ProfileConnection = Connection & {
-  __typename?: 'ProfileConnection';
+export type Global_ProfileConnection = Connection & {
+  __typename?: 'Global_profileConnection';
   pageInfo: PageInfo;
   totalCount: Scalars['Float']['output'];
-  edges?: Maybe<Array<Maybe<ProfileConnectionEdges>>>;
+  edges?: Maybe<Array<Maybe<Global_ProfileConnectionEdges>>>;
 };
 
 export type Mutation = {
@@ -271,8 +273,8 @@ export type Mutation = {
   createFolder: DocumentNode;
   updatePhotoshoots: Photoshoots;
   createPhotoshoots: Photoshoots;
-  updateProfile: Profile;
-  createProfile: Profile;
+  updateGlobal_profile: Global_Profile;
+  createGlobal_profile: Global_Profile;
 };
 
 
@@ -321,30 +323,31 @@ export type MutationCreatePhotoshootsArgs = {
 };
 
 
-export type MutationUpdateProfileArgs = {
+export type MutationUpdateGlobal_ProfileArgs = {
   relativePath: Scalars['String']['input'];
-  params: ProfileMutation;
+  params: Global_ProfileMutation;
 };
 
 
-export type MutationCreateProfileArgs = {
+export type MutationCreateGlobal_ProfileArgs = {
   relativePath: Scalars['String']['input'];
-  params: ProfileMutation;
+  params: Global_ProfileMutation;
 };
 
 export type DocumentUpdateMutation = {
   photoshoots?: InputMaybe<PhotoshootsMutation>;
-  profile?: InputMaybe<ProfileMutation>;
+  global_profile?: InputMaybe<Global_ProfileMutation>;
   relativePath?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type DocumentMutation = {
   photoshoots?: InputMaybe<PhotoshootsMutation>;
-  profile?: InputMaybe<ProfileMutation>;
+  global_profile?: InputMaybe<Global_ProfileMutation>;
 };
 
 export type PhotoshootsMutation = {
   title?: InputMaybe<Scalars['String']['input']>;
+  title_ru?: InputMaybe<Scalars['String']['input']>;
   location?: InputMaybe<Scalars['String']['input']>;
   camera?: InputMaybe<Scalars['String']['input']>;
   date?: InputMaybe<Scalars['String']['input']>;
@@ -353,12 +356,12 @@ export type PhotoshootsMutation = {
   caption_ru?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type ProfileMutation = {
+export type Global_ProfileMutation = {
   name?: InputMaybe<Scalars['String']['input']>;
   bio_en?: InputMaybe<Scalars['String']['input']>;
   bio_ru?: InputMaybe<Scalars['String']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
-  profile_image?: InputMaybe<Scalars['String']['input']>;
+  portrait?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type StringFilter = {
@@ -370,6 +373,7 @@ export type StringFilter = {
 
 export type PhotoshootsFilter = {
   title?: StringFilter | null | undefined;
+  title_ru?: StringFilter | null | undefined;
   location?: StringFilter | null | undefined;
   camera?: StringFilter | null | undefined;
   date?: StringFilter | null | undefined;
@@ -378,24 +382,24 @@ export type PhotoshootsFilter = {
   caption_ru?: StringFilter | null | undefined;
 };
 
-export type ProfileFilter = {
+export type Global_ProfileFilter = {
   name?: StringFilter | null | undefined;
   bio_en?: StringFilter | null | undefined;
   bio_ru?: StringFilter | null | undefined;
   email?: StringFilter | null | undefined;
-  profile_image?: StringFilter | null | undefined;
+  portrait?: StringFilter | null | undefined;
 };
 
-export type PhotoshootsPartsFragment = { __typename: 'Photoshoots', title: string, location: string, camera: string | null, date: string | null, images: Array<string | null> | null, caption_en: string | null, caption_ru: string | null };
+export type PhotoshootsPartsFragment = { __typename: 'Photoshoots', title: string, title_ru: string | null, location: string, camera: string | null, date: string | null, images: Array<string | null> | null, caption_en: string | null, caption_ru: string | null };
 
-export type ProfilePartsFragment = { __typename: 'Profile', name: string, bio_en: string | null, bio_ru: string | null, email: string | null, profile_image: string | null };
+export type Global_ProfilePartsFragment = { __typename: 'Global_profile', name: string, bio_en: string | null, bio_ru: string | null, email: string | null, portrait: string | null };
 
 export type PhotoshootsQueryVariables = Exact<{
   relativePath: string;
 }>;
 
 
-export type PhotoshootsQuery = { photoshoots: { __typename: 'Photoshoots', id: string, title: string, location: string, camera: string | null, date: string | null, images: Array<string | null> | null, caption_en: string | null, caption_ru: string | null, _sys: { filename: string, basename: string, hasReferences: boolean | null, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
+export type PhotoshootsQuery = { photoshoots: { __typename: 'Photoshoots', id: string, title: string, title_ru: string | null, location: string, camera: string | null, date: string | null, images: Array<string | null> | null, caption_en: string | null, caption_ru: string | null, _sys: { filename: string, basename: string, hasReferences: boolean | null, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
 
 export type PhotoshootsConnectionQueryVariables = Exact<{
   before?: string | null | undefined;
@@ -407,31 +411,32 @@ export type PhotoshootsConnectionQueryVariables = Exact<{
 }>;
 
 
-export type PhotoshootsConnectionQuery = { photoshootsConnection: { totalCount: number, pageInfo: { hasPreviousPage: boolean, hasNextPage: boolean, startCursor: string, endCursor: string }, edges: Array<{ cursor: string, node: { __typename: 'Photoshoots', id: string, title: string, location: string, camera: string | null, date: string | null, images: Array<string | null> | null, caption_en: string | null, caption_ru: string | null, _sys: { filename: string, basename: string, hasReferences: boolean | null, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | null } | null> | null } };
+export type PhotoshootsConnectionQuery = { photoshootsConnection: { totalCount: number, pageInfo: { hasPreviousPage: boolean, hasNextPage: boolean, startCursor: string, endCursor: string }, edges: Array<{ cursor: string, node: { __typename: 'Photoshoots', id: string, title: string, title_ru: string | null, location: string, camera: string | null, date: string | null, images: Array<string | null> | null, caption_en: string | null, caption_ru: string | null, _sys: { filename: string, basename: string, hasReferences: boolean | null, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | null } | null> | null } };
 
-export type ProfileQueryVariables = Exact<{
+export type Global_ProfileQueryVariables = Exact<{
   relativePath: string;
 }>;
 
 
-export type ProfileQuery = { profile: { __typename: 'Profile', id: string, name: string, bio_en: string | null, bio_ru: string | null, email: string | null, profile_image: string | null, _sys: { filename: string, basename: string, hasReferences: boolean | null, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
+export type Global_ProfileQuery = { global_profile: { __typename: 'Global_profile', id: string, name: string, bio_en: string | null, bio_ru: string | null, email: string | null, portrait: string | null, _sys: { filename: string, basename: string, hasReferences: boolean | null, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
 
-export type ProfileConnectionQueryVariables = Exact<{
+export type Global_ProfileConnectionQueryVariables = Exact<{
   before?: string | null | undefined;
   after?: string | null | undefined;
   first?: number | null | undefined;
   last?: number | null | undefined;
   sort?: string | null | undefined;
-  filter?: ProfileFilter | null | undefined;
+  filter?: Global_ProfileFilter | null | undefined;
 }>;
 
 
-export type ProfileConnectionQuery = { profileConnection: { totalCount: number, pageInfo: { hasPreviousPage: boolean, hasNextPage: boolean, startCursor: string, endCursor: string }, edges: Array<{ cursor: string, node: { __typename: 'Profile', id: string, name: string, bio_en: string | null, bio_ru: string | null, email: string | null, profile_image: string | null, _sys: { filename: string, basename: string, hasReferences: boolean | null, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | null } | null> | null } };
+export type Global_ProfileConnectionQuery = { global_profileConnection: { totalCount: number, pageInfo: { hasPreviousPage: boolean, hasNextPage: boolean, startCursor: string, endCursor: string }, edges: Array<{ cursor: string, node: { __typename: 'Global_profile', id: string, name: string, bio_en: string | null, bio_ru: string | null, email: string | null, portrait: string | null, _sys: { filename: string, basename: string, hasReferences: boolean | null, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | null } | null> | null } };
 
 export const PhotoshootsPartsFragmentDoc = gql`
     fragment PhotoshootsParts on Photoshoots {
   __typename
   title
+  title_ru
   location
   camera
   date
@@ -440,14 +445,14 @@ export const PhotoshootsPartsFragmentDoc = gql`
   caption_ru
 }
     `;
-export const ProfilePartsFragmentDoc = gql`
-    fragment ProfileParts on Profile {
+export const Global_ProfilePartsFragmentDoc = gql`
+    fragment Global_profileParts on Global_profile {
   __typename
   name
   bio_en
   bio_ru
   email
-  profile_image
+  portrait
 }
     `;
 export const PhotoshootsDocument = gql`
@@ -507,9 +512,9 @@ export const PhotoshootsConnectionDocument = gql`
   }
 }
     ${PhotoshootsPartsFragmentDoc}`;
-export const ProfileDocument = gql`
-    query profile($relativePath: String!) {
-  profile(relativePath: $relativePath) {
+export const Global_ProfileDocument = gql`
+    query global_profile($relativePath: String!) {
+  global_profile(relativePath: $relativePath) {
     ... on Document {
       _sys {
         filename
@@ -522,13 +527,13 @@ export const ProfileDocument = gql`
       }
       id
     }
-    ...ProfileParts
+    ...Global_profileParts
   }
 }
-    ${ProfilePartsFragmentDoc}`;
-export const ProfileConnectionDocument = gql`
-    query profileConnection($before: String, $after: String, $first: Float, $last: Float, $sort: String, $filter: ProfileFilter) {
-  profileConnection(
+    ${Global_ProfilePartsFragmentDoc}`;
+export const Global_ProfileConnectionDocument = gql`
+    query global_profileConnection($before: String, $after: String, $first: Float, $last: Float, $sort: String, $filter: Global_profileFilter) {
+  global_profileConnection(
     before: $before
     after: $after
     first: $first
@@ -558,12 +563,12 @@ export const ProfileConnectionDocument = gql`
           }
           id
         }
-        ...ProfileParts
+        ...Global_profileParts
       }
     }
   }
 }
-    ${ProfilePartsFragmentDoc}`;
+    ${Global_ProfilePartsFragmentDoc}`;
 export type Requester<C= {}> = <R, V>(doc: DocumentNode, vars?: V, options?: C) => Promise<R>
   export function getSdk<C>(requester: Requester<C>) {
     return {
@@ -573,11 +578,11 @@ export type Requester<C= {}> = <R, V>(doc: DocumentNode, vars?: V, options?: C) 
     photoshootsConnection(variables?: PhotoshootsConnectionQueryVariables, options?: C): Promise<{data: PhotoshootsConnectionQuery, errors?: { message: string, locations: { line: number, column: number }[], path: string[] }[], variables: PhotoshootsConnectionQueryVariables, query: string}> {
         return requester<{data: PhotoshootsConnectionQuery, errors?: { message: string, locations: { line: number, column: number }[], path: string[] }[], variables: PhotoshootsConnectionQueryVariables, query: string}, PhotoshootsConnectionQueryVariables>(PhotoshootsConnectionDocument, variables, options);
       },
-    profile(variables: ProfileQueryVariables, options?: C): Promise<{data: ProfileQuery, errors?: { message: string, locations: { line: number, column: number }[], path: string[] }[], variables: ProfileQueryVariables, query: string}> {
-        return requester<{data: ProfileQuery, errors?: { message: string, locations: { line: number, column: number }[], path: string[] }[], variables: ProfileQueryVariables, query: string}, ProfileQueryVariables>(ProfileDocument, variables, options);
+    global_profile(variables: Global_ProfileQueryVariables, options?: C): Promise<{data: Global_ProfileQuery, errors?: { message: string, locations: { line: number, column: number }[], path: string[] }[], variables: Global_ProfileQueryVariables, query: string}> {
+        return requester<{data: Global_ProfileQuery, errors?: { message: string, locations: { line: number, column: number }[], path: string[] }[], variables: Global_ProfileQueryVariables, query: string}, Global_ProfileQueryVariables>(Global_ProfileDocument, variables, options);
       },
-    profileConnection(variables?: ProfileConnectionQueryVariables, options?: C): Promise<{data: ProfileConnectionQuery, errors?: { message: string, locations: { line: number, column: number }[], path: string[] }[], variables: ProfileConnectionQueryVariables, query: string}> {
-        return requester<{data: ProfileConnectionQuery, errors?: { message: string, locations: { line: number, column: number }[], path: string[] }[], variables: ProfileConnectionQueryVariables, query: string}, ProfileConnectionQueryVariables>(ProfileConnectionDocument, variables, options);
+    global_profileConnection(variables?: Global_ProfileConnectionQueryVariables, options?: C): Promise<{data: Global_ProfileConnectionQuery, errors?: { message: string, locations: { line: number, column: number }[], path: string[] }[], variables: Global_ProfileConnectionQueryVariables, query: string}> {
+        return requester<{data: Global_ProfileConnectionQuery, errors?: { message: string, locations: { line: number, column: number }[], path: string[] }[], variables: Global_ProfileConnectionQueryVariables, query: string}, Global_ProfileConnectionQueryVariables>(Global_ProfileConnectionDocument, variables, options);
       }
     };
   }

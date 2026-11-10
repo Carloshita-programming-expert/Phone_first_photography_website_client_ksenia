@@ -9,6 +9,7 @@ export const PhotoshootsPartsFragmentDoc = gql`
     fragment PhotoshootsParts on Photoshoots {
   __typename
   title
+  title_ru
   location
   camera
   date
@@ -17,14 +18,14 @@ export const PhotoshootsPartsFragmentDoc = gql`
   caption_ru
 }
     `;
-export const ProfilePartsFragmentDoc = gql`
-    fragment ProfileParts on Profile {
+export const Global_ProfilePartsFragmentDoc = gql`
+    fragment Global_profileParts on Global_profile {
   __typename
   name
   bio_en
   bio_ru
   email
-  profile_image
+  portrait
 }
     `;
 export const PhotoshootsDocument = gql`
@@ -84,9 +85,9 @@ export const PhotoshootsConnectionDocument = gql`
   }
 }
     ${PhotoshootsPartsFragmentDoc}`;
-export const ProfileDocument = gql`
-    query profile($relativePath: String!) {
-  profile(relativePath: $relativePath) {
+export const Global_ProfileDocument = gql`
+    query global_profile($relativePath: String!) {
+  global_profile(relativePath: $relativePath) {
     ... on Document {
       _sys {
         filename
@@ -99,13 +100,13 @@ export const ProfileDocument = gql`
       }
       id
     }
-    ...ProfileParts
+    ...Global_profileParts
   }
 }
-    ${ProfilePartsFragmentDoc}`;
-export const ProfileConnectionDocument = gql`
-    query profileConnection($before: String, $after: String, $first: Float, $last: Float, $sort: String, $filter: ProfileFilter) {
-  profileConnection(
+    ${Global_ProfilePartsFragmentDoc}`;
+export const Global_ProfileConnectionDocument = gql`
+    query global_profileConnection($before: String, $after: String, $first: Float, $last: Float, $sort: String, $filter: Global_profileFilter) {
+  global_profileConnection(
     before: $before
     after: $after
     first: $first
@@ -135,12 +136,12 @@ export const ProfileConnectionDocument = gql`
           }
           id
         }
-        ...ProfileParts
+        ...Global_profileParts
       }
     }
   }
 }
-    ${ProfilePartsFragmentDoc}`;
+    ${Global_ProfilePartsFragmentDoc}`;
 export function getSdk(requester) {
   return {
     photoshoots(variables, options) {
@@ -149,11 +150,11 @@ export function getSdk(requester) {
     photoshootsConnection(variables, options) {
       return requester(PhotoshootsConnectionDocument, variables, options);
     },
-    profile(variables, options) {
-      return requester(ProfileDocument, variables, options);
+    global_profile(variables, options) {
+      return requester(Global_ProfileDocument, variables, options);
     },
-    profileConnection(variables, options) {
-      return requester(ProfileConnectionDocument, variables, options);
+    global_profileConnection(variables, options) {
+      return requester(Global_ProfileConnectionDocument, variables, options);
     }
   };
 }

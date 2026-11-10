@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const baseClient = createClient({
-  cacheDir: "/home/carlo/photography-portfolio/tina/__generated__/.cache/1794315869675",
+  cacheDir: "/home/carlo/photography-portfolio/tina/__generated__/.cache/1794332393799",
   url: "http://localhost:4001/graphql",
   token: "null",
   queries,
@@ -75,45 +75,19 @@ function getLocalProfile() {
   };
 }
 
-const originalPhotoshootsConnection = baseClient.queries.photoshootsConnection.bind(baseClient.queries);
+const originalPhotoshootsConnection = baseClient.queries.photoshootsConnection?.bind(baseClient.queries);
 baseClient.queries.photoshootsConnection = async (args?: any, options?: any) => {
   try {
-    return await originalPhotoshootsConnection(args, options);
-  } catch (_err) {
-    const edges = getLocalPhotoshoots();
-    return {
-      data: {
-        photoshootsConnection: {
-          totalCount: edges.length,
-          pageInfo: {
-            hasPreviousPage: false,
-            hasNextPage: false,
-            startCursor: "",
-            endCursor: "",
-          },
-          edges,
-        },
-      },
-      variables: args || {},
-      query: "",
-    } as any;
-  }
-};
-
-const originalProfileConnection = baseClient.queries.profileConnection?.bind(baseClient.queries);
-const profileQueryHandler = async (args?: any, options?: any) => {
-  try {
-    if (originalProfileConnection) {
-      return await originalProfileConnection(args, options);
+    if (originalPhotoshootsConnection) {
+      return await originalPhotoshootsConnection(args, options);
     }
   } catch (_err) {
-    // fallback
+    // fallback to local content
   }
-  const profile = getLocalProfile();
-  const edges = profile ? [profile] : [];
+  const edges = getLocalPhotoshoots();
   return {
     data: {
-      profileConnection: {
+      photoshootsConnection: {
         totalCount: edges.length,
         pageInfo: {
           hasPreviousPage: false,
@@ -123,6 +97,30 @@ const profileQueryHandler = async (args?: any, options?: any) => {
         },
         edges,
       },
+    },
+    variables: args || {},
+    query: "",
+  } as any;
+};
+
+const originalGlobalProfileConnection = (baseClient.queries as any).global_profileConnection?.bind(baseClient.queries);
+const originalProfileConnection = (baseClient.queries as any).profileConnection?.bind(baseClient.queries);
+
+const profileQueryHandler = async (args?: any, options?: any) => {
+  try {
+    if (originalGlobalProfileConnection) {
+      return await originalGlobalProfileConnection(args, options);
+    }
+    if (originalProfileConnection) {
+      return await originalProfileConnection(args, options);
+    }
+  } catch (_err) {
+    // fallback to local content
+  }
+  const profile = getLocalProfile();
+  const edges = profile ? [profile] : [];
+  return {
+    data: {
       global_profileConnection: {
         totalCount: edges.length,
         pageInfo: {
@@ -133,7 +131,7 @@ const profileQueryHandler = async (args?: any, options?: any) => {
         },
         edges,
       },
-      globalProfileConnection: {
+      profileConnection: {
         totalCount: edges.length,
         pageInfo: {
           hasPreviousPage: false,
@@ -143,20 +141,18 @@ const profileQueryHandler = async (args?: any, options?: any) => {
         },
         edges,
       },
-      profile: profile?.node || null,
       global_profile: profile?.node || null,
-      globalProfile: profile?.node || null,
+      profile: profile?.node || null,
     },
     variables: args || {},
     query: "",
   } as any;
 };
 
-baseClient.queries.profileConnection = profileQueryHandler;
 (baseClient.queries as any).global_profileConnection = profileQueryHandler;
-(baseClient.queries as any).globalProfileConnection = profileQueryHandler;
+(baseClient.queries as any).profileConnection = profileQueryHandler;
 (baseClient.queries as any).global_profile = profileQueryHandler;
-(baseClient.queries as any).globalProfile = profileQueryHandler;
+(baseClient.queries as any).profile = profileQueryHandler;
 
 export const client = baseClient;
 export default client;

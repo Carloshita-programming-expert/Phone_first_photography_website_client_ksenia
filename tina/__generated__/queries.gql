@@ -53,8 +53,8 @@ query photoshootsConnection($before: String, $after: String, $first: Float, $las
   }
 }
 
-query profile($relativePath: String!) {
-  profile(relativePath: $relativePath) {
+query global_profile($relativePath: String!) {
+  global_profile(relativePath: $relativePath) {
     ... on Document {
       _sys {
         filename
@@ -67,12 +67,12 @@ query profile($relativePath: String!) {
       }
       id
     }
-    ...ProfileParts
+    ...Global_profileParts
   }
 }
 
-query profileConnection($before: String, $after: String, $first: Float, $last: Float, $sort: String, $filter: ProfileFilter) {
-  profileConnection(
+query global_profileConnection($before: String, $after: String, $first: Float, $last: Float, $sort: String, $filter: Global_profileFilter) {
+  global_profileConnection(
     before: $before
     after: $after
     first: $first
@@ -102,7 +102,7 @@ query profileConnection($before: String, $after: String, $first: Float, $last: F
           }
           id
         }
-        ...ProfileParts
+        ...Global_profileParts
       }
     }
   }

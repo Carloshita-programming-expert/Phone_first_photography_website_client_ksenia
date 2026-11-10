@@ -59,13 +59,13 @@ type Query {
   document(collection: String, relativePath: String): DocumentNode!
   photoshoots(relativePath: String): Photoshoots!
   photoshootsConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: PhotoshootsFilter): PhotoshootsConnection!
-  profile(relativePath: String): Profile!
-  profileConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: ProfileFilter): ProfileConnection!
+  global_profile(relativePath: String): Global_profile!
+  global_profileConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: Global_profileFilter): Global_profileConnection!
 }
 
 input DocumentFilter {
   photoshoots: PhotoshootsFilter
-  profile: ProfileFilter
+  global_profile: Global_profileFilter
 }
 
 type DocumentConnectionEdges {
@@ -91,10 +91,11 @@ type Collection {
   documents(before: String, after: String, first: Float, last: Float, sort: String, filter: DocumentFilter, folder: String): DocumentConnection!
 }
 
-union DocumentNode = Photoshoots | Profile | Folder
+union DocumentNode = Photoshoots | Global_profile | Folder
 
 type Photoshoots implements Node & Document {
   title: String!
+  title_ru: String
   location: String!
   camera: String
   date: String
@@ -115,6 +116,7 @@ input StringFilter {
 
 input PhotoshootsFilter {
   title: StringFilter
+  title_ru: StringFilter
   location: StringFilter
   camera: StringFilter
   date: StringFilter
@@ -134,34 +136,34 @@ type PhotoshootsConnection implements Connection {
   edges: [PhotoshootsConnectionEdges]
 }
 
-type Profile implements Node & Document {
+type Global_profile implements Node & Document {
   name: String!
   bio_en: String
   bio_ru: String
   email: String
-  profile_image: String
+  portrait: String
   id: ID!
   _sys: SystemInfo!
   _values: JSON!
 }
 
-input ProfileFilter {
+input Global_profileFilter {
   name: StringFilter
   bio_en: StringFilter
   bio_ru: StringFilter
   email: StringFilter
-  profile_image: StringFilter
+  portrait: StringFilter
 }
 
-type ProfileConnectionEdges {
+type Global_profileConnectionEdges {
   cursor: String!
-  node: Profile
+  node: Global_profile
 }
 
-type ProfileConnection implements Connection {
+type Global_profileConnection implements Connection {
   pageInfo: PageInfo!
   totalCount: Float!
-  edges: [ProfileConnectionEdges]
+  edges: [Global_profileConnectionEdges]
 }
 
 type Mutation {
@@ -172,23 +174,24 @@ type Mutation {
   createFolder(collection: String, relativePath: String!): DocumentNode!
   updatePhotoshoots(relativePath: String!, params: PhotoshootsMutation!): Photoshoots!
   createPhotoshoots(relativePath: String!, params: PhotoshootsMutation!): Photoshoots!
-  updateProfile(relativePath: String!, params: ProfileMutation!): Profile!
-  createProfile(relativePath: String!, params: ProfileMutation!): Profile!
+  updateGlobal_profile(relativePath: String!, params: Global_profileMutation!): Global_profile!
+  createGlobal_profile(relativePath: String!, params: Global_profileMutation!): Global_profile!
 }
 
 input DocumentUpdateMutation {
   photoshoots: PhotoshootsMutation
-  profile: ProfileMutation
+  global_profile: Global_profileMutation
   relativePath: String
 }
 
 input DocumentMutation {
   photoshoots: PhotoshootsMutation
-  profile: ProfileMutation
+  global_profile: Global_profileMutation
 }
 
 input PhotoshootsMutation {
   title: String
+  title_ru: String
   location: String
   camera: String
   date: String
@@ -197,12 +200,12 @@ input PhotoshootsMutation {
   caption_ru: String
 }
 
-input ProfileMutation {
+input Global_profileMutation {
   name: String
   bio_en: String
   bio_ru: String
   email: String
-  profile_image: String
+  portrait: String
 }
 
 schema {

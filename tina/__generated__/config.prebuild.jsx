@@ -26,9 +26,14 @@ var config_default = defineConfig({
           {
             type: "string",
             name: "title",
-            label: "Title",
+            label: "Title (EN)",
             isTitle: true,
             required: true
+          },
+          {
+            type: "string",
+            name: "title_ru",
+            label: "Title (RU)"
           },
           {
             type: "string",
@@ -71,10 +76,17 @@ var config_default = defineConfig({
         ]
       },
       {
-        name: "profile",
-        label: "Profile",
+        name: "global_profile",
+        label: "Global Profile",
         path: "content/profile",
         format: "json",
+        ui: {
+          global: true,
+          allowedActions: {
+            create: false,
+            delete: false
+          }
+        },
         fields: [
           {
             type: "string",
@@ -106,8 +118,8 @@ var config_default = defineConfig({
           },
           {
             type: "string",
-            name: "profile_image",
-            label: "Profile Image Cloudinary ID"
+            name: "portrait",
+            label: "Portrait Image (Cloudinary ID)"
           }
         ]
       }
