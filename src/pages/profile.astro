@@ -17,7 +17,7 @@ const bioRu =
   profile?.bio_ru ||
   'Визуальный художник и пленочный фотограф из Берлина. Исследует архитектурный брутализм, ночные городские пейзажи и уединенные геологические ландшафты Европы и Центральной Азии на 35-миллиметровую и среднеформатную пленку.';
 const email = profile?.email || 'ksenia@visualstories.photography';
-const profileImage = profile?.profile_image || 'samples/people/smiling-man';
+const profileImage = profile?.portrait || profile?.profile_image || 'samples/people/smiling-man';
 ---
 
 <Layout

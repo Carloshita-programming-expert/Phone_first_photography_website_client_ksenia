@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import HeroProfile from '../components/HeroProfile.astro';
 import FeedPost from '../components/FeedPost.astro';
 import MasonryGrid from '../components/MasonryGrid.astro';
 import { client } from '../../tina/__generated__/client';
@@ -16,38 +17,44 @@ const posts = response.data?.photoshootsConnection?.edges?.map((edge) => edge?.n
   currentLang={currentLang}
   activeTab="home"
 >
-  <!-- Mobile Viewport: Instagram-style vertical scroll-snap feed (block lg:hidden) -->
-  <section class="block lg:hidden w-full flex flex-col" aria-label="Mobile Photography Feed">
-    {posts.map((post, index) => (
-      <FeedPost
-        id={post.id || post._sys?.filename}
-        title={post.title}
-        location={post.location}
-        camera={post.camera || '35mm Film'}
-        date={post.date || 'Recent Series'}
-        images={(post.images || []).filter(Boolean) as string[]}
-        captions={{
-          en: post.caption_en || '',
-          ru: post.caption_ru || '',
-        }}
-        isFirstPost={index === 0}
-      />
-    ))}
-  </section>
+  <!-- Landing View: Profile-First Experience (min-h-screen initial viewport) -->
+  <HeroProfile currentLang={currentLang} />
 
-  <!-- Desktop Override: Full-monitor masonry gallery (hidden lg:block) -->
-  <section class="hidden lg:block w-full px-4 sm:px-6" aria-label="Desktop Masonry Gallery">
-    <div class="mb-8 flex flex-col items-center text-center">
-      <span class="text-xs font-mono uppercase tracking-[0.3em] text-neutral-400">
-        Fine Art & Documentary
-      </span>
-      <h1 class="font-serif text-3xl xl:text-4xl text-neutral-100 tracking-tight font-normal mt-2">
-        Curated Photographic Works
-      </h1>
-      <p class="text-sm text-neutral-400 max-w-lg mx-auto mt-2 font-light leading-relaxed">
-        Analogue visual diaries capturing architectural form, shadow studies, and remote topographies across Kyoto, Iceland, Berlin, Almaty, and Milos.
-      </p>
-    </div>
-    <MasonryGrid posts={posts} />
-  </section>
+  <!-- Photography Works Section below the Hero Profile -->
+  <div id="photography-section" class="w-full pt-8 sm:pt-12 border-t border-neutral-900/60">
+    <!-- Mobile Viewport: Instagram-style vertical scroll-snap feed (block lg:hidden) -->
+    <section class="block lg:hidden w-full flex flex-col" aria-label="Mobile Photography Feed">
+      {posts.map((post, index) => (
+        <FeedPost
+          id={post.id || post._sys?.filename}
+          title={post.title}
+          location={post.location}
+          camera={post.camera || '35mm Film'}
+          date={post.date || 'Recent Series'}
+          images={(post.images || []).filter(Boolean) as string[]}
+          captions={{
+            en: post.caption_en || '',
+            ru: post.caption_ru || '',
+          }}
+          isFirstPost={index === 0}
+        />
+      ))}
+    </section>
+
+    <!-- Desktop Viewport: Gallery Override (hidden lg:block) -->
+    <section class="hidden lg:block w-full px-4 sm:px-6" aria-label="Desktop Gallery">
+      <div class="mb-8 flex flex-col items-center text-center">
+        <span class="text-xs font-mono uppercase tracking-[0.3em] text-neutral-400">
+          Fine Art & Documentary
+        </span>
+        <h2 class="font-serif text-3xl xl:text-4xl text-neutral-100 tracking-tight font-normal mt-2">
+          Curated Photographic Works
+        </h2>
+        <p class="text-sm text-neutral-400 max-w-lg mx-auto mt-2 font-light leading-relaxed">
+          Analogue visual diaries capturing architectural form, shadow studies, and remote topographies across Kyoto, Iceland, Berlin, Almaty, and Milos.
+        </p>
+      </div>
+      <MasonryGrid posts={posts} />
+    </section>
+  </div>
 </Layout>
