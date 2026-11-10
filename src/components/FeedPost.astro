@@ -75,7 +75,7 @@ const postId = `post-${id}`;
           data-slide-index={index}
         >
           <img
-            src={getCloudinaryUrl(imgId, 'f_auto,q_auto,w_1080,c_limit')}
+            src={getCloudinaryUrl(imgId, 'f_auto,q_auto')}
             alt={`${title} - Photograph ${index + 1}`}
             loading={isFirstPost && index === 0 ? 'eager' : 'lazy'}
             decoding="async"

@@ -45,7 +45,7 @@ const allPhotos = posts.flatMap((post) => {
       >
         <div class="w-full relative overflow-hidden bg-neutral-900/40">
           <img
-            src={getCloudinaryUrl(photo.imgId, 'f_auto,q_auto,w_800,c_limit')}
+            src={getCloudinaryUrl(photo.imgId, 'f_auto,q_auto')}
             alt={`${photo.title} · ${photo.location}`}
             loading={i < 6 ? 'eager' : 'lazy'}
             decoding="async"

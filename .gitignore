@@ -16,6 +16,9 @@ Thumbs.db
 .idea/
 .vscode/
 
+# Tina cache
+tina/__generated__/.cache/
+
 # Raw image binaries strictly prohibited in repo
 *.png
 *.jpg
