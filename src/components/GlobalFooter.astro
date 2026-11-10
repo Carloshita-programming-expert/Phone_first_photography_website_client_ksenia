@@ -1,0 +1,110 @@
+---
+import { client } from '../../tina/__generated__/client';
+import { Mail, ArrowUp, Sparkles } from 'lucide-astro';
+
+interface Props {
+  currentLang?: 'en' | 'ru';
+}
+
+const { currentLang = 'en' } = Astro.props;
+
+// Fetch Global Profile singleton data from TinaCMS
+const profileRes = await (client.queries.global_profileConnection
+  ? client.queries.global_profileConnection()
+  : client.queries.profileConnection());
+
+const profileNode =
+  profileRes.data?.global_profileConnection?.edges?.[0]?.node ||
+  profileRes.data?.profileConnection?.edges?.[0]?.node ||
+  profileRes.data?.global_profile ||
+  profileRes.data?.profile;
+
+const name = profileNode?.name || 'Ksenia';
+const email = profileNode?.email || 'ksenia@visualstories.photography';
+const currentYear = new Date().getFullYear();
+---
+
+<footer
+  class="global-footer w-full border-t border-neutral-900 bg-black/95 backdrop-blur-md pt-12 pb-24 lg:pb-12 px-6 text-center select-none"
+  aria-label="Universal Site Footer"
+>
+  <div class="max-w-2xl mx-auto flex flex-col items-center">
+    <!-- Subtle Editorial Brand Monogram -->
+    <div class="flex items-center gap-2 mb-4">
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+      <span class="font-serif tracking-widest text-xs uppercase font-medium text-neutral-300">
+        {name} · Analog Visual Archives
+      </span>
+    </div>
+
+    <!-- Editorial Call to Action Heading -->
+    <h3 class="font-serif text-2xl sm:text-3xl text-neutral-100 tracking-tight font-normal">
+      <span data-bio-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>
+        Available for Commissions & Worldwide Inquiries
+      </span>
+      <span data-bio-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>
+        Открыта для коммерческих съемок и международных проектов
+      </span>
+    </h3>
+
+    <!-- Subtitle Description -->
+    <p class="text-xs sm:text-sm text-neutral-400 max-w-md mx-auto mt-2 font-light leading-relaxed">
+      <span data-bio-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>
+        Editorial assignments, architecture documentation, analog prints, and artistic collaborations.
+      </span>
+      <span data-bio-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>
+        Редакционные съемки, архитектурная документалистика, авторские отпечатки и арт-коллаборации.
+      </span>
+    </p>
+
+    <!-- Primary Contact / Booking Button (Linked to TinaCMS Email) -->
+    <div class="mt-6 flex flex-col items-center">
+      <a
+        href={`mailto:${email}?subject=Commission%20%2F%20Booking%20Inquiry`}
+        class="inline-flex items-center gap-2.5 px-8 py-3 rounded-full bg-neutral-100 text-black font-semibold text-xs uppercase tracking-widest hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_rgba(255,255,255,0.18)]"
+        aria-label={`Send booking inquiry to ${email}`}
+      >
+        <Mail class="w-4 h-4 text-black stroke-[2]" />
+        <span data-bio-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>
+          Contact & Booking
+        </span>
+        <span data-bio-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>
+          Связаться и забронировать
+        </span>
+      </a>
+
+      <!-- Direct Email Label -->
+      <a
+        href={`mailto:${email}`}
+        class="mt-3 text-xs font-mono text-neutral-400 hover:text-neutral-200 transition-colors"
+      >
+        {email}
+      </a>
+    </div>
+
+    <!-- Divider -->
+    <div class="w-16 h-[1px] bg-neutral-800/80 my-8"></div>
+
+    <!-- Footer Bottom: Copyright & Back to Top -->
+    <div class="w-full flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] font-mono text-neutral-400">
+      <div class="text-center sm:text-left">
+        <span data-bio-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>
+          © {currentYear} {name}. All rights reserved. Curated 35mm works.
+        </span>
+        <span data-bio-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>
+          © {currentYear} {name}. Все права защищены. Архив пленочных работ.
+        </span>
+      </div>
+
+      <button
+        type="button"
+        onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+        class="inline-flex items-center gap-1.5 text-neutral-400 hover:text-neutral-200 transition-colors uppercase tracking-wider"
+        aria-label="Scroll back to top"
+      >
+        <span>Top</span>
+        <ArrowUp class="w-3 h-3 stroke-[2]" />
+      </button>
+    </div>
+  </div>
+</footer>

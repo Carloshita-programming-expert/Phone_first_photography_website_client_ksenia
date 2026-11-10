@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import BottomNav from '../components/BottomNav.astro';
 import TopNav from '../components/TopNav.astro';
+import GlobalFooter from '../components/GlobalFooter.astro';
 
 interface Props {
   title?: string;
@@ -61,9 +62,12 @@ const {
       </header>
 
       <!-- Main Scroll Area -->
-      <main class="flex-1 w-full pb-20 lg:pb-16 lg:pt-4">
+      <main class="flex-1 w-full pb-8 lg:pb-16 lg:pt-4">
         <slot />
       </main>
+
+      <!-- Universal Site Footer Call-To-Action -->
+      <GlobalFooter currentLang={currentLang} />
 
       <!-- Fixed Bottom Navigation (Mobile Only, lg:hidden) -->
       <BottomNav currentLang={currentLang} activeTab={activeTab} />

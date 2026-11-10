@@ -126,9 +126,21 @@ const resolvedActiveTab: 'home' | 'grid' | 'about' =
         const isActive = btnLang === lang;
         btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
         if (isActive) {
-          btn.className = 'lang-toggle-btn px-2.5 py-1 rounded-full transition-all duration-200 bg-neutral-100 text-black shadow-sm font-semibold';
+          btn.classList.add('bg-neutral-100', 'text-black', 'shadow-sm', 'font-semibold');
+          btn.classList.remove('text-neutral-400', 'hover:text-white');
         } else {
-          btn.className = 'lang-toggle-btn px-2.5 py-1 rounded-full transition-all duration-200 text-neutral-400 hover:text-white';
+          btn.classList.remove('bg-neutral-100', 'text-black', 'shadow-sm', 'font-semibold');
+          btn.classList.add('text-neutral-400', 'hover:text-white');
+        }
+      });
+
+      // Synchronize FeedPost & Filmstrip titles
+      document.querySelectorAll<HTMLElement>('[data-title-lang]').forEach((el) => {
+        const titleLang = el.getAttribute('data-title-lang');
+        if (titleLang === lang) {
+          el.classList.remove('hidden');
+        } else {
+          el.classList.add('hidden');
         }
       });
 
