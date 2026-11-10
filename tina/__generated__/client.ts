@@ -23,6 +23,7 @@ function getLocalPhotoshoots() {
         __typename: "Photoshoots" as const,
         id: data.id || file.replace(".json", ""),
         title: data.title || "",
+        title_ru: data.title_ru || "",
         location: data.location || "",
         camera: data.camera || "",
         date: data.date || "",
@@ -53,13 +54,14 @@ function getLocalProfile() {
   return {
     cursor: files[0],
     node: {
-      __typename: "Profile" as const,
+      __typename: "Global_profile" as const,
       id: "ksenia",
       name: data.name || "Ksenia",
       bio_en: data.bio_en || "",
       bio_ru: data.bio_ru || "",
       email: data.email || "",
-      profile_image: data.profile_image || "",
+      portrait: data.portrait || data.profile_image || "",
+      profile_image: data.portrait || data.profile_image || "",
       _sys: {
         filename: files[0].replace(".json", ""),
         basename: files[0],
@@ -98,31 +100,63 @@ baseClient.queries.photoshootsConnection = async (args?: any, options?: any) => 
   }
 };
 
-const originalProfileConnection = baseClient.queries.profileConnection.bind(baseClient.queries);
-baseClient.queries.profileConnection = async (args?: any, options?: any) => {
+const originalProfileConnection = baseClient.queries.profileConnection?.bind(baseClient.queries);
+const profileQueryHandler = async (args?: any, options?: any) => {
   try {
-    return await originalProfileConnection(args, options);
+    if (originalProfileConnection) {
+      return await originalProfileConnection(args, options);
+    }
   } catch (_err) {
-    const profile = getLocalProfile();
-    const edges = profile ? [profile] : [];
-    return {
-      data: {
-        profileConnection: {
-          totalCount: edges.length,
-          pageInfo: {
-            hasPreviousPage: false,
-            hasNextPage: false,
-            startCursor: "",
-            endCursor: "",
-          },
-          edges,
-        },
-      },
-      variables: args || {},
-      query: "",
-    } as any;
+    // fallback
   }
+  const profile = getLocalProfile();
+  const edges = profile ? [profile] : [];
+  return {
+    data: {
+      profileConnection: {
+        totalCount: edges.length,
+        pageInfo: {
+          hasPreviousPage: false,
+          hasNextPage: false,
+          startCursor: "",
+          endCursor: "",
+        },
+        edges,
+      },
+      global_profileConnection: {
+        totalCount: edges.length,
+        pageInfo: {
+          hasPreviousPage: false,
+          hasNextPage: false,
+          startCursor: "",
+          endCursor: "",
+        },
+        edges,
+      },
+      globalProfileConnection: {
+        totalCount: edges.length,
+        pageInfo: {
+          hasPreviousPage: false,
+          hasNextPage: false,
+          startCursor: "",
+          endCursor: "",
+        },
+        edges,
+      },
+      profile: profile?.node || null,
+      global_profile: profile?.node || null,
+      globalProfile: profile?.node || null,
+    },
+    variables: args || {},
+    query: "",
+  } as any;
 };
+
+baseClient.queries.profileConnection = profileQueryHandler;
+(baseClient.queries as any).global_profileConnection = profileQueryHandler;
+(baseClient.queries as any).globalProfileConnection = profileQueryHandler;
+(baseClient.queries as any).global_profile = profileQueryHandler;
+(baseClient.queries as any).globalProfile = profileQueryHandler;
 
 export const client = baseClient;
 export default client;
