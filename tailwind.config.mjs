@@ -15,6 +15,12 @@ export default {
           card: '#121212',
           border: '#222222',
         },
+        luxury: {
+          base: '#0B0C0E',      // Deep obsidian dark background
+          taupe: '#8C7562',     // Warm bronze/taupe for borders, secondary text, metadata
+          crimson: '#711C1D',   // Rich wine/crimson for active indicators, hover states, accent borders
+          cream: '#F4F1EA',     // Soft alabaster/cream for primary headings and body copy
+        },
       },
     },
   },

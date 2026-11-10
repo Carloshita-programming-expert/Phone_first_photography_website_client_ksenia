@@ -45,19 +45,19 @@ const filmstripFrames = posts.flatMap((post, postIdx) => {
 
 <div class="w-full relative py-6 select-none" aria-label="Desktop Filmstrip Gallery">
   <!-- Filmstrip Aesthetic Perforations (Top Border) -->
-  <div class="w-full border-t border-b border-neutral-900 bg-neutral-950/60 py-2.5 px-6 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-400">
+  <div class="w-full border-t border-b border-luxury-taupe/20 bg-luxury-base/60 py-2.5 px-6 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.25em] text-luxury-taupe">
     <div class="flex items-center gap-3">
-      <span class="flex items-center gap-1.5 text-neutral-400">
-        <Film class="w-3.5 h-3.5 text-neutral-400" />
+      <span class="flex items-center gap-1.5 text-luxury-taupe">
+        <Film class="w-3.5 h-3.5 text-luxury-taupe" />
         <span>35mm Analog Contact Strip</span>
       </span>
-      <span class="text-neutral-700">|</span>
+      <span class="text-luxury-taupe/40">|</span>
       <span>ISO 400 · Natural Grain</span>
     </div>
-    <div class="flex items-center gap-3 text-neutral-400">
+    <div class="flex items-center gap-3 text-luxury-taupe">
       <span>{filmstripFrames.length} Curated Exposures</span>
-      <span class="text-neutral-700">|</span>
-      <span class="text-neutral-400">Mouse Wheel ↔ Horizontal Scroll</span>
+      <span class="text-luxury-taupe/40">|</span>
+      <span class="text-luxury-taupe">Mouse Wheel ↔ Horizontal Scroll</span>
     </div>
   </div>
 
@@ -70,21 +70,21 @@ const filmstripFrames = posts.flatMap((post, postIdx) => {
   >
     {filmstripFrames.map((frame, idx) => (
       <article
-        class="flex-shrink-0 flex flex-col justify-between bg-neutral-950/80 border border-neutral-900/80 rounded-md p-3 group transition-all duration-300 hover:border-neutral-700 hover:shadow-[0_10px_35px_rgba(0,0,0,0.8)]"
+        class="flex-shrink-0 flex flex-col justify-between bg-luxury-base/90 border border-luxury-taupe/20 rounded-md p-3 group transition-all duration-300 hover:border-luxury-taupe/60 hover:shadow-[0_10px_35px_rgba(11,12,14,0.9)]"
         data-film-frame={idx}
       >
         <!-- Top Frame Metadata Header -->
-        <div class="flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-neutral-400 pb-2.5 border-b border-neutral-900/80 mb-3">
+        <div class="flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-luxury-taupe pb-2.5 border-b border-luxury-taupe/20 mb-3">
           <div class="flex items-center gap-2">
-            <span class="text-neutral-400 font-semibold">EXP {String(idx + 1).padStart(2, '0')}</span>
-            <span class="text-neutral-400">·</span>
-            <span class="text-neutral-400">{frame.camera}</span>
+            <span class="text-luxury-cream font-semibold">EXP {String(idx + 1).padStart(2, '0')}</span>
+            <span class="text-luxury-taupe/40">·</span>
+            <span class="text-luxury-taupe">{frame.camera}</span>
           </div>
-          <span class="text-neutral-400">{frame.frameNumber}/{frame.totalFrames}</span>
+          <span class="text-luxury-taupe">{frame.frameNumber}/{frame.totalFrames}</span>
         </div>
 
         <!-- Film Frame Image Area (h-[70vh] w-auto) -->
-        <div class="relative h-[68vh] xl:h-[70vh] w-auto overflow-hidden rounded bg-black/90 flex items-center justify-center">
+        <div class="relative h-[68vh] xl:h-[70vh] w-auto overflow-hidden rounded bg-luxury-base flex items-center justify-center border border-luxury-taupe/10">
           <img
             src={getCloudinaryUrl(frame.imgId, 'f_auto,q_auto')}
             alt={`${frame.titleEn} · ${frame.location}`}
@@ -94,15 +94,15 @@ const filmstripFrames = posts.flatMap((post, postIdx) => {
           />
 
           <!-- Ambient Bottom Vignette Gradient on Hover -->
-          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-luxury-base/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
         </div>
 
         <!-- Bottom Frame Metadata & Bilingual Title -->
-        <div class="pt-3 border-t border-neutral-900/80 mt-3 flex flex-col gap-1">
+        <div class="pt-3 border-t border-luxury-taupe/20 mt-3 flex flex-col gap-1">
           <div class="flex items-center justify-between">
             <!-- Dynamic Bilingual Title -->
             <h3
-              class="font-serif text-sm tracking-tight text-neutral-100 font-medium"
+              class="font-serif text-sm tracking-tight text-luxury-cream font-medium"
               data-title-container
             >
               <span
@@ -120,19 +120,19 @@ const filmstripFrames = posts.flatMap((post, postIdx) => {
             </h3>
 
             <!-- Location Badge -->
-            <div class="flex items-center gap-1 text-[11px] font-mono text-neutral-400">
-              <MapPin class="w-3 h-3 text-neutral-500" />
+            <div class="flex items-center gap-1 text-[11px] font-mono text-luxury-taupe">
+              <MapPin class="w-3 h-3 text-luxury-taupe" />
               <span>{frame.location}</span>
             </div>
           </div>
 
           <!-- Date & Caption Snippet -->
-          <div class="flex items-center justify-between text-[10px] font-mono text-neutral-400 mt-0.5">
+          <div class="flex items-center justify-between text-[10px] font-mono text-luxury-taupe mt-0.5">
             <span class="flex items-center gap-1">
-              <Calendar class="w-3 h-3 text-neutral-500" />
+              <Calendar class="w-3 h-3 text-luxury-taupe" />
               <span>{frame.date}</span>
             </span>
-            <span class="text-[9px] tracking-widest uppercase text-neutral-400">
+            <span class="text-[9px] tracking-widest uppercase text-luxury-taupe/70">
               Negative ID #{frame.frameId}
             </span>
           </div>
@@ -142,13 +142,13 @@ const filmstripFrames = posts.flatMap((post, postIdx) => {
   </div>
 
   <!-- Filmstrip Aesthetic Perforations (Bottom Border) -->
-  <div class="w-full border-t border-b border-neutral-900 bg-neutral-950/60 py-2 px-6 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.3em] text-neutral-400">
+  <div class="w-full border-t border-b border-luxury-taupe/20 bg-luxury-base/60 py-2 px-6 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.3em] text-luxury-taupe/80">
     <div class="flex items-center gap-4">
       <span>▲ SAFETY FILM ▲</span>
       <span>EASTMAN 5222</span>
       <span>FRAME SAFETY MARGIN</span>
     </div>
-    <div class="flex items-center gap-4 text-neutral-400">
+    <div class="flex items-center gap-4 text-luxury-taupe">
       <span>END OF CASSETTE</span>
     </div>
   </div>
