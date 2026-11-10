@@ -1,0 +1,116 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCloudinaryUrl } from '../utils/cloudinary';
+import { client } from '../../tina/__generated__/client';
+import { Mail, Camera, MapPin, Film, Sparkles } from 'lucide-astro';
+
+const currentLang = (Astro.url.searchParams.get('lang') as 'en' | 'ru') || 'en';
+
+const profileRes = await client.queries.profileConnection();
+const profile = profileRes.data?.profileConnection?.edges?.[0]?.node;
+
+const name = profile?.name || 'Ksenia';
+const bioEn =
+  profile?.bio_en ||
+  'Visual artist and analog photographer based in Berlin. Exploring brutalist geometry, nocturnal streetscapes, and solitary geological landscapes across Europe and Central Asia using 35mm and medium format systems.';
+const bioRu =
+  profile?.bio_ru ||
+  'Визуальный художник и пленочный фотограф из Берлина. Исследует архитектурный брутализм, ночные городские пейзажи и уединенные геологические ландшафты Европы и Центральной Азии на 35-миллиметровую и среднеформатную пленку.';
+const email = profile?.email || 'ksenia@visualstories.photography';
+const profileImage = profile?.profile_image || 'samples/people/smiling-man';
+---
+
+<Layout
+  title={`${name} | Profile & Contact`}
+  description={`Editorial profile and contact info for ${name}, visual artist and analog photographer.`}
+  currentLang={currentLang}
+  activeTab="about"
+>
+  <div class="w-full max-w-xl mx-auto px-4 py-8 sm:py-12 flex flex-col items-center text-center">
+    <!-- Centered Editorial Profile Portrait -->
+    <div class="relative group mb-6">
+      <div class="absolute -inset-1 rounded-full bg-gradient-to-tr from-neutral-700 via-neutral-800 to-neutral-600 opacity-60 blur-sm group-hover:opacity-100 transition duration-500"></div>
+      <div class="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden border-2 border-neutral-800 shadow-2xl bg-neutral-900">
+        <img
+          src={getCloudinaryUrl(profileImage, 'f_auto,q_auto,w_500,c_fill,g_face')}
+          alt={`${name} portrait`}
+          loading="eager"
+          decoding="async"
+          class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+        />
+      </div>
+      <div class="absolute bottom-1 right-2 w-6 h-6 rounded-full bg-emerald-500/90 border-2 border-black flex items-center justify-center shadow-lg" title="Available for assignments">
+        <Sparkles class="w-3 h-3 text-black stroke-[2.5]" />
+      </div>
+    </div>
+
+    <!-- Name & Editorial Byline -->
+    <h1 class="font-serif text-3xl sm:text-4xl text-neutral-100 font-normal tracking-tight">
+      {name}
+    </h1>
+    <div class="flex items-center gap-2 mt-2 text-xs font-mono uppercase tracking-widest text-neutral-400">
+      <span class="flex items-center gap-1">
+        <MapPin class="w-3 h-3 text-neutral-500" />
+        Berlin · Worldwide
+      </span>
+      <span>•</span>
+      <span class="flex items-center gap-1">
+        <Camera class="w-3 h-3 text-neutral-500" />
+        Analog Works
+      </span>
+    </div>
+
+    <!-- Editorial Divider -->
+    <div class="w-12 h-[1px] bg-neutral-800 my-6"></div>
+
+    <!-- Bilingual Bio Text Blocks -->
+    <div class="w-full space-y-4 text-sm sm:text-base leading-relaxed text-neutral-300 font-light text-left sm:text-center px-2">
+      <!-- English Bio Block -->
+      <p class="bio-text-en transition-opacity duration-200" data-bio-lang="en">
+        {bioEn}
+      </p>
+
+      <!-- Russian Bio Block -->
+      <p class="bio-text-ru text-neutral-400 italic text-sm transition-opacity duration-200" data-bio-lang="ru">
+        {bioRu}
+      </p>
+    </div>
+
+    <!-- Apparatus & Philosophy Sub-card -->
+    <div class="w-full grid grid-cols-2 gap-3 mt-8 text-left">
+      <div class="p-3.5 rounded-lg bg-neutral-950 border border-neutral-900 flex flex-col justify-between">
+        <div class="flex items-center gap-1.5 text-neutral-400 text-xs font-mono uppercase tracking-wider">
+          <Film class="w-3.5 h-3.5 text-neutral-500" />
+          <span>Primary Media</span>
+        </div>
+        <p class="text-xs text-neutral-200 font-medium mt-1">
+          CineStill 800T · Portra 160 · Tri-X 400
+        </p>
+      </div>
+
+      <div class="p-3.5 rounded-lg bg-neutral-950 border border-neutral-900 flex flex-col justify-between">
+        <div class="flex items-center gap-1.5 text-neutral-400 text-xs font-mono uppercase tracking-wider">
+          <Camera class="w-3.5 h-3.5 text-neutral-500" />
+          <span>Apparatus</span>
+        </div>
+        <p class="text-xs text-neutral-200 font-medium mt-1">
+          Leica M6 · Hasselblad 500C/M · Pentax 67
+        </p>
+      </div>
+    </div>
+
+    <!-- Clean Editorial Contact Button -->
+    <div class="mt-10">
+      <a
+        href={`mailto:${email}?subject=Commission%20%2F%20Print%20Inquiry`}
+        class="inline-flex items-center gap-2.5 px-7 py-3 rounded-full bg-neutral-100 text-black font-semibold text-xs uppercase tracking-widest hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-[0_0_25px_rgba(255,255,255,0.15)]"
+      >
+        <Mail class="w-4 h-4 text-black stroke-[2]" />
+        <span>Initiate Inquiry</span>
+      </a>
+      <div class="mt-3 text-[11px] font-mono text-neutral-500">
+        {email}
+      </div>
+    </div>
+  </div>
+</Layout>

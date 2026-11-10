@@ -6,51 +6,78 @@ interface Props {
   activeTab?: 'home' | 'grid' | 'about';
 }
 
-const { currentLang = 'en', activeTab = 'home' } = Astro.props;
+const { currentLang = 'en', activeTab } = Astro.props;
+
+const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
+const resolvedActiveTab: 'home' | 'grid' | 'about' =
+  activeTab ||
+  (pathname.startsWith('/collage')
+    ? 'grid'
+    : pathname.startsWith('/profile')
+      ? 'about'
+      : 'home');
 ---
 
 <nav
-  class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[470px] z-50 bg-neutral-950/85 backdrop-blur-xl border-t border-neutral-800/70 px-6 py-2.5 transition-all duration-300"
-  aria-label="Bottom Navigation"
+  class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[470px] z-50 bg-neutral-950/90 backdrop-blur-xl border-t border-neutral-800/80 px-6 py-2.5 transition-all duration-300 lg:hidden"
+  aria-label="Mobile Bottom Navigation"
 >
   <div class="flex items-center justify-between">
     <!-- Home Tab -->
     <a
       href="/"
       id="nav-home"
-      class={`flex flex-col items-center gap-1 py-1 transition-colors ${
-        activeTab === 'home' ? 'text-white' : 'text-neutral-400 hover:text-neutral-200'
+      class={`relative flex flex-col items-center gap-1 py-1 transition-colors ${
+        resolvedActiveTab === 'home'
+          ? 'text-white font-medium'
+          : 'text-neutral-400 hover:text-neutral-200'
       }`}
       aria-label="Home Feed"
+      aria-current={resolvedActiveTab === 'home' ? 'page' : undefined}
     >
-      <Home class="w-6 h-6 stroke-[1.75]" />
-      <span class="text-[10px] font-medium tracking-tight">Feed</span>
+      <Home class="w-5 h-5 stroke-[1.8]" />
+      <span class="text-[10px] tracking-tight">Feed</span>
+      {resolvedActiveTab === 'home' && (
+        <span class="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white shadow-[0_0_6px_rgba(255,255,255,0.8)]"></span>
+      )}
     </a>
 
-    <!-- Grid / Gallery Tab -->
+    <!-- Grid / Collage Tab -->
     <a
-      href="#grid"
+      href="/collage"
       id="nav-grid"
-      class={`flex flex-col items-center gap-1 py-1 transition-colors ${
-        activeTab === 'grid' ? 'text-white' : 'text-neutral-400 hover:text-neutral-200'
+      class={`relative flex flex-col items-center gap-1 py-1 transition-colors ${
+        resolvedActiveTab === 'grid'
+          ? 'text-white font-medium'
+          : 'text-neutral-400 hover:text-neutral-200'
       }`}
-      aria-label="Photoshoot Grid"
+      aria-label="Collage Grid"
+      aria-current={resolvedActiveTab === 'grid' ? 'page' : undefined}
     >
-      <Grid class="w-6 h-6 stroke-[1.75]" />
-      <span class="text-[10px] font-medium tracking-tight">Grid</span>
+      <Grid class="w-5 h-5 stroke-[1.8]" />
+      <span class="text-[10px] tracking-tight">Collage</span>
+      {resolvedActiveTab === 'grid' && (
+        <span class="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white shadow-[0_0_6px_rgba(255,255,255,0.8)]"></span>
+      )}
     </a>
 
-    <!-- About Tab -->
+    <!-- Profile / About Tab -->
     <a
-      href="#about"
+      href="/profile"
       id="nav-about"
-      class={`flex flex-col items-center gap-1 py-1 transition-colors ${
-        activeTab === 'about' ? 'text-white' : 'text-neutral-400 hover:text-neutral-200'
+      class={`relative flex flex-col items-center gap-1 py-1 transition-colors ${
+        resolvedActiveTab === 'about'
+          ? 'text-white font-medium'
+          : 'text-neutral-400 hover:text-neutral-200'
       }`}
-      aria-label="About Photographer"
+      aria-label="Photographer Profile"
+      aria-current={resolvedActiveTab === 'about' ? 'page' : undefined}
     >
-      <User class="w-6 h-6 stroke-[1.75]" />
-      <span class="text-[10px] font-medium tracking-tight">About</span>
+      <User class="w-5 h-5 stroke-[1.8]" />
+      <span class="text-[10px] tracking-tight">Profile</span>
+      {resolvedActiveTab === 'about' && (
+        <span class="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white shadow-[0_0_6px_rgba(255,255,255,0.8)]"></span>
+      )}
     </a>
 
     <!-- Language Toggle (EN / RU) -->
@@ -64,7 +91,7 @@ const { currentLang = 'en', activeTab = 'home' } = Astro.props;
         data-lang-btn="en"
         class={`lang-toggle-btn px-2.5 py-1 rounded-full transition-all duration-200 ${
           currentLang === 'en'
-            ? 'bg-neutral-100 text-black shadow-sm'
+            ? 'bg-neutral-100 text-black shadow-sm font-semibold'
             : 'text-neutral-400 hover:text-white'
         }`}
         aria-pressed={currentLang === 'en' ? 'true' : 'false'}
@@ -76,7 +103,7 @@ const { currentLang = 'en', activeTab = 'home' } = Astro.props;
         data-lang-btn="ru"
         class={`lang-toggle-btn px-2.5 py-1 rounded-full transition-all duration-200 ${
           currentLang === 'ru'
-            ? 'bg-neutral-100 text-black shadow-sm'
+            ? 'bg-neutral-100 text-black shadow-sm font-semibold'
             : 'text-neutral-400 hover:text-white'
         }`}
         aria-pressed={currentLang === 'ru' ? 'true' : 'false'}
@@ -88,55 +115,60 @@ const { currentLang = 'en', activeTab = 'home' } = Astro.props;
 </nav>
 
 <script>
-  // Lightweight client-side toggle for instant zero-reload language switching
-  // Syncs with data attributes across FeedPost caption containers
   function setupLanguageToggle() {
     const buttons = document.querySelectorAll<HTMLButtonElement>('[data-lang-btn]');
     const url = new URL(window.location.href);
-    const initialLang = url.searchParams.get('lang') || 'en';
+    const initialLang = (url.searchParams.get('lang') as 'en' | 'ru') || 'en';
 
     function setLanguage(lang: 'en' | 'ru') {
-      // Update toggle buttons active styles
       buttons.forEach((btn) => {
         const btnLang = btn.getAttribute('data-lang-btn');
         const isActive = btnLang === lang;
         btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
         if (isActive) {
-          btn.className = 'lang-toggle-btn px-2.5 py-1 rounded-full transition-all duration-200 bg-neutral-100 text-black shadow-sm';
+          btn.className = 'lang-toggle-btn px-2.5 py-1 rounded-full transition-all duration-200 bg-neutral-100 text-black shadow-sm font-semibold';
         } else {
           btn.className = 'lang-toggle-btn px-2.5 py-1 rounded-full transition-all duration-200 text-neutral-400 hover:text-white';
         }
       });
 
-      // Update feed caption visibility
-      document.querySelectorAll('[data-caption-lang]').forEach((el) => {
-        const itemLang = el.getAttribute('data-caption-lang');
-        if (itemLang === lang) {
+      // Synchronize FeedPost captions
+      document.querySelectorAll<HTMLElement>('[data-caption-lang]').forEach((el) => {
+        const captionLang = el.getAttribute('data-caption-lang');
+        if (captionLang === lang) {
           el.classList.remove('hidden');
         } else {
           el.classList.add('hidden');
         }
       });
 
-      // Keep query param in sync for bookmarking
-      const currentUrl = new URL(window.location.href);
-      currentUrl.searchParams.set('lang', lang);
-      window.history.replaceState({}, '', currentUrl.toString());
+      // Synchronize Profile bio paragraphs
+      document.querySelectorAll<HTMLElement>('[data-bio-lang]').forEach((el) => {
+        const bioLang = el.getAttribute('data-bio-lang');
+        if (bioLang === lang) {
+          el.classList.remove('hidden');
+        } else {
+          el.classList.add('hidden');
+        }
+      });
+
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.set('lang', lang);
+      window.history.replaceState({}, '', newUrl.toString());
     }
 
     buttons.forEach((btn) => {
       btn.addEventListener('click', () => {
-        const selected = btn.getAttribute('data-lang-btn') as 'en' | 'ru';
-        if (selected) setLanguage(selected);
+        const selectedLang = btn.getAttribute('data-lang-btn') as 'en' | 'ru';
+        if (selectedLang) {
+          setLanguage(selectedLang);
+        }
       });
     });
 
-    if (initialLang === 'ru') {
-      setLanguage('ru');
-    }
+    setLanguage(initialLang);
   }
 
-  // Initialize on page load
   setupLanguageToggle();
   document.addEventListener('astro:page-load', setupLanguageToggle);
 </script>

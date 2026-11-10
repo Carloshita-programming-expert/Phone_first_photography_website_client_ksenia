@@ -1,0 +1,33 @@
+---
+import Layout from '../layouts/Layout.astro';
+import MasonryGrid from '../components/MasonryGrid.astro';
+import { client } from '../../tina/__generated__/client';
+
+const currentLang = (Astro.url.searchParams.get('lang') as 'en' | 'ru') || 'en';
+
+const response = await client.queries.photoshootsConnection();
+const posts = response.data?.photoshootsConnection?.edges?.map((edge) => edge?.node).filter(Boolean) || [];
+---
+
+<Layout
+  title="Collage | Visual Stories"
+  description="Full-archive masonry grid exhibiting analog photography studies across Europe and Asia."
+  currentLang={currentLang}
+  activeTab="grid"
+>
+  <div class="w-full px-3 py-4 sm:px-6">
+    <header class="mb-6 text-center">
+      <span class="text-[10px] font-mono uppercase tracking-[0.2em] text-neutral-400">
+        Curated Archives
+      </span>
+      <h1 class="font-serif text-2xl sm:text-3xl text-neutral-100 tracking-tight font-medium mt-1">
+        Photographic Collage
+      </h1>
+      <p class="text-xs text-neutral-400 max-w-md mx-auto mt-2 leading-relaxed">
+        A seamless composite of 35mm and medium format captures across all expeditions.
+      </p>
+    </header>
+
+    <MasonryGrid posts={posts} />
+  </div>
+</Layout>
