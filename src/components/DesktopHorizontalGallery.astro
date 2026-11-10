@@ -1,0 +1,187 @@
+---
+import { getCloudinaryUrl } from '../utils/cloudinary';
+import { Camera, MapPin, Film, Calendar } from 'lucide-astro';
+
+export interface PostItem {
+  id?: string;
+  title?: string;
+  title_ru?: string;
+  location?: string;
+  camera?: string;
+  date?: string;
+  images?: (string | null)[] | null;
+  caption_en?: string | null;
+  caption_ru?: string | null;
+  _sys?: { filename?: string };
+}
+
+interface Props {
+  posts: PostItem[];
+  currentLang?: 'en' | 'ru';
+}
+
+const { posts = [], currentLang = 'en' } = Astro.props;
+
+// Flatten all images into a sequenced filmstrip series
+const filmstripFrames = posts.flatMap((post, postIdx) => {
+  const images = (post.images || []).filter(Boolean) as string[];
+  return images.map((imgId, imgIdx) => ({
+    frameId: `${post.id || postIdx}-${imgIdx}`,
+    imgId,
+    titleEn: post.title || 'Untitled Series',
+    titleRu: post.title_ru || post.title || 'Безымянная серия',
+    location: post.location || 'Unknown Location',
+    camera: post.camera || '35mm Film',
+    date: post.date || 'Recent',
+    captionEn: post.caption_en || '',
+    captionRu: post.caption_ru || '',
+    frameNumber: String(imgIdx + 1).padStart(2, '0'),
+    totalFrames: String(images.length).padStart(2, '0'),
+    seriesTitleEn: post.title || 'Series',
+    seriesTitleRu: post.title_ru || post.title || 'Серия',
+  }));
+});
+---
+
+<div class="w-full relative py-6 select-none" aria-label="Desktop Filmstrip Gallery">
+  <!-- Filmstrip Aesthetic Perforations (Top Border) -->
+  <div class="w-full border-t border-b border-neutral-900 bg-neutral-950/60 py-2.5 px-6 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-400">
+    <div class="flex items-center gap-3">
+      <span class="flex items-center gap-1.5 text-neutral-400">
+        <Film class="w-3.5 h-3.5 text-neutral-400" />
+        <span>35mm Analog Contact Strip</span>
+      </span>
+      <span class="text-neutral-700">|</span>
+      <span>ISO 400 · Natural Grain</span>
+    </div>
+    <div class="flex items-center gap-3 text-neutral-400">
+      <span>{filmstripFrames.length} Curated Exposures</span>
+      <span class="text-neutral-700">|</span>
+      <span class="text-neutral-400">Mouse Wheel ↔ Horizontal Scroll</span>
+    </div>
+  </div>
+
+  <!-- Main Horizontal Scroll Container -->
+  <div
+    class="desktop-horizontal-gallery flex flex-row overflow-x-auto gap-6 sm:gap-8 px-8 py-8 items-stretch no-scrollbar scroll-smooth focus:outline-none"
+    tabindex="0"
+    role="region"
+    aria-label="Horizontal Photography Filmstrip"
+  >
+    {filmstripFrames.map((frame, idx) => (
+      <article
+        class="flex-shrink-0 flex flex-col justify-between bg-neutral-950/80 border border-neutral-900/80 rounded-md p-3 group transition-all duration-300 hover:border-neutral-700 hover:shadow-[0_10px_35px_rgba(0,0,0,0.8)]"
+        data-film-frame={idx}
+      >
+        <!-- Top Frame Metadata Header -->
+        <div class="flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-neutral-400 pb-2.5 border-b border-neutral-900/80 mb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-neutral-400 font-semibold">EXP {String(idx + 1).padStart(2, '0')}</span>
+            <span class="text-neutral-400">·</span>
+            <span class="text-neutral-400">{frame.camera}</span>
+          </div>
+          <span class="text-neutral-400">{frame.frameNumber}/{frame.totalFrames}</span>
+        </div>
+
+        <!-- Film Frame Image Area (h-[70vh] w-auto) -->
+        <div class="relative h-[68vh] xl:h-[70vh] w-auto overflow-hidden rounded bg-black/90 flex items-center justify-center">
+          <img
+            src={getCloudinaryUrl(frame.imgId, 'f_auto,q_auto')}
+            alt={`${frame.titleEn} · ${frame.location}`}
+            loading={idx < 4 ? 'eager' : 'lazy'}
+            decoding="async"
+            class="h-full w-auto max-w-none object-contain select-none pointer-events-none transition-transform duration-700 ease-out group-hover:scale-[1.015]"
+          />
+
+          <!-- Ambient Bottom Vignette Gradient on Hover -->
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+        </div>
+
+        <!-- Bottom Frame Metadata & Bilingual Title -->
+        <div class="pt-3 border-t border-neutral-900/80 mt-3 flex flex-col gap-1">
+          <div class="flex items-center justify-between">
+            <!-- Dynamic Bilingual Title -->
+            <h3
+              class="font-serif text-sm tracking-tight text-neutral-100 font-medium"
+              data-title-container
+            >
+              <span
+                class={`title-text-en ${currentLang === 'ru' ? 'hidden' : ''}`}
+                data-title-lang="en"
+              >
+                {frame.titleEn}
+              </span>
+              <span
+                class={`title-text-ru ${currentLang === 'en' ? 'hidden' : ''}`}
+                data-title-lang="ru"
+              >
+                {frame.titleRu}
+              </span>
+            </h3>
+
+            <!-- Location Badge -->
+            <div class="flex items-center gap-1 text-[11px] font-mono text-neutral-400">
+              <MapPin class="w-3 h-3 text-neutral-500" />
+              <span>{frame.location}</span>
+            </div>
+          </div>
+
+          <!-- Date & Caption Snippet -->
+          <div class="flex items-center justify-between text-[10px] font-mono text-neutral-400 mt-0.5">
+            <span class="flex items-center gap-1">
+              <Calendar class="w-3 h-3 text-neutral-500" />
+              <span>{frame.date}</span>
+            </span>
+            <span class="text-[9px] tracking-widest uppercase text-neutral-400">
+              Negative ID #{frame.frameId}
+            </span>
+          </div>
+        </div>
+      </article>
+    ))}
+  </div>
+
+  <!-- Filmstrip Aesthetic Perforations (Bottom Border) -->
+  <div class="w-full border-t border-b border-neutral-900 bg-neutral-950/60 py-2 px-6 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.3em] text-neutral-400">
+    <div class="flex items-center gap-4">
+      <span>▲ SAFETY FILM ▲</span>
+      <span>EASTMAN 5222</span>
+      <span>FRAME SAFETY MARGIN</span>
+    </div>
+    <div class="flex items-center gap-4 text-neutral-400">
+      <span>END OF CASSETTE</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Mouse-wheel translation: converts vertical mouse wheel scroll to horizontal scroll
+  function setupDesktopHorizontalGallery() {
+    const galleries = document.querySelectorAll<HTMLElement>('.desktop-horizontal-gallery');
+
+    galleries.forEach((gallery) => {
+      // Prevent duplicate event listeners
+      if (gallery.dataset.wheelInitialized === 'true') return;
+      gallery.dataset.wheelInitialized = 'true';
+
+      gallery.addEventListener('wheel', (evt: WheelEvent) => {
+        // Only intercept if there's vertical scroll delta and the element is horizontally scrollable
+        if (evt.deltaY !== 0) {
+          const maxScrollLeft = gallery.scrollWidth - gallery.clientWidth;
+          // If at left boundary and scrolling up/left, allow default page vertical scroll
+          const atStart = gallery.scrollLeft <= 0 && evt.deltaY < 0;
+          // If at right boundary and scrolling down/right, allow default page vertical scroll
+          const atEnd = gallery.scrollLeft >= maxScrollLeft - 2 && evt.deltaY > 0;
+
+          if (!atStart && !atEnd) {
+            evt.preventDefault();
+            gallery.scrollLeft += evt.deltaY;
+          }
+        }
+      }, { passive: false });
+    });
+  }
+
+  setupDesktopHorizontalGallery();
+  document.addEventListener('astro:page-load', setupDesktopHorizontalGallery);
+</script>

@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import HeroProfile from '../components/HeroProfile.astro';
 import FeedPost from '../components/FeedPost.astro';
-import MasonryGrid from '../components/MasonryGrid.astro';
+import DesktopHorizontalGallery from '../components/DesktopHorizontalGallery.astro';
 import { client } from '../../tina/__generated__/client';
 
 const currentLang = (Astro.url.searchParams.get('lang') as 'en' | 'ru') || 'en';
@@ -28,6 +28,7 @@ const posts = response.data?.photoshootsConnection?.edges?.map((edge) => edge?.n
         <FeedPost
           id={post.id || post._sys?.filename}
           title={post.title}
+          title_ru={post.title_ru}
           location={post.location}
           camera={post.camera || '35mm Film'}
           date={post.date || 'Recent Series'}
@@ -41,20 +42,21 @@ const posts = response.data?.photoshootsConnection?.edges?.map((edge) => edge?.n
       ))}
     </section>
 
-    <!-- Desktop Viewport: Gallery Override (hidden lg:block) -->
-    <section class="hidden lg:block w-full px-4 sm:px-6" aria-label="Desktop Gallery">
-      <div class="mb-8 flex flex-col items-center text-center">
+    <!-- Desktop Viewport: Horizontal Scroll Filmstrip Gallery (hidden lg:block) -->
+    <section class="hidden lg:block w-full" aria-label="Desktop Filmstrip Gallery">
+      <div class="mb-6 flex flex-col items-center text-center px-4">
         <span class="text-xs font-mono uppercase tracking-[0.3em] text-neutral-400">
-          Fine Art & Documentary
+          Curated Photographic Works
         </span>
         <h2 class="font-serif text-3xl xl:text-4xl text-neutral-100 tracking-tight font-normal mt-2">
-          Curated Photographic Works
+          The Filmstrip Archives
         </h2>
         <p class="text-sm text-neutral-400 max-w-lg mx-auto mt-2 font-light leading-relaxed">
-          Analogue visual diaries capturing architectural form, shadow studies, and remote topographies across Kyoto, Iceland, Berlin, Almaty, and Milos.
+          High-resolution 35mm and medium format captures arranged as an expansive contact sheet. Scroll horizontally using your mouse wheel.
         </p>
       </div>
-      <MasonryGrid posts={posts} />
+
+      <DesktopHorizontalGallery posts={posts} currentLang={currentLang} />
     </section>
   </div>
 </Layout>
