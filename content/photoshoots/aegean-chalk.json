@@ -1,0 +1,14 @@
+{
+  "id": "aegean-chalk",
+  "title": "Lunar Coastlines",
+  "location": "Milos, Greece",
+  "camera": "Pentax 67 · Kodak Portra 160",
+  "date": "June 2026",
+  "images": [
+    "cld-sample",
+    "samples/food/dessert",
+    "samples/landscapes/beach-boat"
+  ],
+  "caption_en": "Bleached limestone arches sculpted by millenniums of salt and mist against deep Aegean ultramarine.",
+  "caption_ru": "Выбеленные известняковые арки, веками обтесанные солью и туманом, на фоне глубокого эгейского ультрамарина."
+}

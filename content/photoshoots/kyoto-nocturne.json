@@ -1,0 +1,14 @@
+{
+  "id": "kyoto-nocturne",
+  "title": "Nocturnal Reverie",
+  "location": "Kyoto, Japan",
+  "camera": "Leica M6 · CineStill 800T",
+  "date": "October 2026",
+  "images": [
+    "samples/landscapes/nature-mountains",
+    "samples/landscapes/beach-boat",
+    "samples/landscapes/architecture-signs"
+  ],
+  "caption_en": "Twilight settling over the wooden Machiya alleys of Gion. Cyan neon bleeding through paper lantern shadows.",
+  "caption_ru": "Сумерки, опускающиеся на деревянные улочки матиа в Гионе. Бирюзовый неон, пробивающийся сквозь тени бумажных фонарей."
+}

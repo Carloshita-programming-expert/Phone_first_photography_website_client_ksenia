@@ -1,0 +1,19 @@
+fragment PhotoshootsParts on Photoshoots {
+  __typename
+  title
+  location
+  camera
+  date
+  images
+  caption_en
+  caption_ru
+}
+
+fragment ProfileParts on Profile {
+  __typename
+  name
+  bio_en
+  bio_ru
+  email
+  profile_image
+}

@@ -1,9 +1,12 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import FeedPost from '../components/FeedPost.astro';
-import feedData from '../data/feed.json';
+import { client } from '../../tina/__generated__/client';
 
 const currentLang = (Astro.url.searchParams.get('lang') as 'en' | 'ru') || 'en';
+
+const response = await client.queries.photoshootsConnection();
+const posts = response.data?.photoshootsConnection?.edges?.map((edge) => edge?.node).filter(Boolean) || [];
 ---
 
 <Layout
@@ -12,15 +15,18 @@ const currentLang = (Astro.url.searchParams.get('lang') as 'en' | 'ru') || 'en';
   currentLang={currentLang}
 >
   <section class="w-full flex flex-col" aria-label="Photography Feed">
-    {feedData.map((post, index) => (
+    {posts.map((post, index) => (
       <FeedPost
-        id={post.id}
+        id={post.id || post._sys?.filename}
         title={post.title}
         location={post.location}
-        camera={post.camera}
-        date={post.date}
-        images={post.images}
-        captions={post.captions}
+        camera={post.camera || '35mm Film'}
+        date={post.date || 'Recent Series'}
+        images={(post.images || []).filter(Boolean) as string[]}
+        captions={{
+          en: post.caption_en || '',
+          ru: post.caption_ru || '',
+        }}
         isFirstPost={index === 0}
       />
     ))}
