@@ -6,18 +6,49 @@ import { Mail, Camera, MapPin, Film, Sparkles } from 'lucide-astro';
 
 const currentLang = (Astro.url.searchParams.get('lang') as 'en' | 'ru') || 'en';
 
-const profileRes = await client.queries.profileConnection();
-const profile = profileRes.data?.profileConnection?.edges?.[0]?.node;
+const defaultProfile = {
+  name: 'Ksenia',
+  bio_en:
+    'Visual artist and analog photographer based in Berlin. Exploring brutalist geometry, nocturnal streetscapes, and solitary geological landscapes across Europe and Central Asia using 35mm and medium format systems.',
+  bio_ru:
+    'Визуальный художник и пленочный фотограф из Берлина. Исследует архитектурный брутализм, ночные городские пейзажи и уединенные геологические ландшафты Европы и Центральной Азии на 35-миллиметровую и среднеформатную пленку.',
+  email: 'ksenia@visualstories.photography',
+  portrait: 'samples/people/smiling-man',
+};
 
-const name = profile?.name || 'Ksenia';
-const bioEn =
-  profile?.bio_en ||
-  'Visual artist and analog photographer based in Berlin. Exploring brutalist geometry, nocturnal streetscapes, and solitary geological landscapes across Europe and Central Asia using 35mm and medium format systems.';
-const bioRu =
-  profile?.bio_ru ||
-  'Визуальный художник и пленочный фотограф из Берлина. Исследует архитектурный брутализм, ночные городские пейзажи и уединенные геологические ландшафты Европы и Центральной Азии на 35-миллиметровую и среднеформатную пленку.';
-const email = profile?.email || 'ksenia@visualstories.photography';
-const profileImage = profile?.portrait || profile?.profile_image || 'samples/people/smiling-man';
+let profileData: any = null;
+try {
+  if (typeof client.queries.global_profile === 'function') {
+    const profileResponse = await client.queries.global_profile({
+      relativePath: 'ksenia.json',
+    });
+    profileData = profileResponse?.data?.global_profile;
+  } else if (typeof client.queries.global_profileConnection === 'function') {
+    const profileRes = await client.queries.global_profileConnection();
+    profileData = profileRes?.data?.global_profileConnection?.edges?.[0]?.node;
+  } else if (typeof (client.queries as any).profile === 'function') {
+    const profileResponse = await (client.queries as any).profile({
+      relativePath: 'ksenia.json',
+    });
+    profileData = profileResponse?.data?.profile;
+  } else if (typeof (client.queries as any).profileConnection === 'function') {
+    const profileRes = await (client.queries as any).profileConnection();
+    profileData = profileRes?.data?.profileConnection?.edges?.[0]?.node;
+  }
+} catch (_err) {
+  // Gracefully fallback to defaultProfile during static build
+}
+
+const profile = profileData || defaultProfile;
+
+const name = profile?.name || defaultProfile.name;
+const bioEn = profile?.bio_en || defaultProfile.bio_en;
+const bioRu = profile?.bio_ru || defaultProfile.bio_ru;
+const email = profile?.email || defaultProfile.email;
+const profileImage =
+  profile?.portrait ||
+  profile?.profile_image ||
+  defaultProfile.portrait;
 ---
 
 <Layout

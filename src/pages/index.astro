@@ -7,8 +7,15 @@ import { client } from '../../tina/__generated__/client';
 
 const currentLang = (Astro.url.searchParams.get('lang') as 'en' | 'ru') || 'en';
 
-const response = await client.queries.photoshootsConnection();
-const posts = response.data?.photoshootsConnection?.edges?.map((edge) => edge?.node).filter(Boolean) || [];
+let posts: any[] = [];
+try {
+  if (typeof client.queries.photoshootsConnection === 'function') {
+    const response = await client.queries.photoshootsConnection();
+    posts = response?.data?.photoshootsConnection?.edges?.map((edge: any) => edge?.node).filter(Boolean) || [];
+  }
+} catch (_err) {
+  // Graceful fallback during build
+}
 ---
 
 <Layout

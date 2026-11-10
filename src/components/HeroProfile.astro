@@ -9,26 +9,43 @@ interface Props {
 
 const { currentLang = 'en' } = Astro.props;
 
+const defaultProfile = {
+  name: 'Ksenia',
+  bio_en:
+    'Visual artist and analog photographer based in Berlin. Exploring brutalist geometry, fleeting nocturnal light, and solitary landscapes across Europe and Central Asia using 35mm and medium format film.',
+  bio_ru:
+    'Визуальный художник и пленочный фотограф из Берлина. Исследует геометрию брутализма, ускользающий ночной свет и уединенные пейзажи Европы и Центральной Азии на 35-миллиметровую и среднеформатную пленку.',
+  email: 'ksenia@visualstories.photography',
+  portrait: 'samples/people/smiling-man',
+};
+
 // Fetch singleton Global Profile data from TinaCMS
-const profileRes = await (client.queries.global_profileConnection
-  ? client.queries.global_profileConnection()
-  : client.queries.profileConnection());
+let profileNode: any = null;
+try {
+  if (typeof client.queries.global_profile === 'function') {
+    const res = await client.queries.global_profile({ relativePath: 'ksenia.json' });
+    profileNode = res?.data?.global_profile;
+  } else if (typeof client.queries.global_profileConnection === 'function') {
+    const res = await client.queries.global_profileConnection();
+    profileNode = res?.data?.global_profileConnection?.edges?.[0]?.node;
+  } else if (typeof (client.queries as any).profile === 'function') {
+    const res = await (client.queries as any).profile({ relativePath: 'ksenia.json' });
+    profileNode = res?.data?.profile;
+  } else if (typeof (client.queries as any).profileConnection === 'function') {
+    const res = await (client.queries as any).profileConnection();
+    profileNode = res?.data?.profileConnection?.edges?.[0]?.node;
+  }
+} catch (_err) {
+  // Graceful fallback
+}
 
-const profileNode =
-  profileRes.data?.global_profileConnection?.edges?.[0]?.node ||
-  profileRes.data?.profileConnection?.edges?.[0]?.node ||
-  profileRes.data?.global_profile ||
-  profileRes.data?.profile;
+const profile = profileNode || defaultProfile;
 
-const name = profileNode?.name || 'Ksenia';
-const bioEn =
-  profileNode?.bio_en ||
-  'Visual artist and analog photographer based in Berlin. Exploring brutalist geometry, fleeting nocturnal light, and solitary landscapes across Europe and Central Asia using 35mm and medium format film.';
-const bioRu =
-  profileNode?.bio_ru ||
-  'Визуальный художник и пленочный фотограф из Берлина. Исследует геометрию брутализма, ускользающий ночной свет и уединенные пейзажи Европы и Центральной Азии на 35-миллиметровую и среднеформатную пленку.';
-const email = profileNode?.email || 'ksenia@visualstories.photography';
-const portrait = profileNode?.portrait || profileNode?.profile_image || 'samples/people/smiling-man';
+const name = profile?.name || defaultProfile.name;
+const bioEn = profile?.bio_en || defaultProfile.bio_en;
+const bioRu = profile?.bio_ru || defaultProfile.bio_ru;
+const email = profile?.email || defaultProfile.email;
+const portrait = profile?.portrait || profile?.profile_image || defaultProfile.portrait;
 ---
 
 <section

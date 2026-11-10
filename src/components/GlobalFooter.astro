@@ -8,19 +8,35 @@ interface Props {
 
 const { currentLang = 'en' } = Astro.props;
 
+const defaultProfile = {
+  name: 'Ksenia',
+  email: 'ksenia@visualstories.photography',
+};
+
 // Fetch Global Profile singleton data from TinaCMS
-const profileRes = await (client.queries.global_profileConnection
-  ? client.queries.global_profileConnection()
-  : client.queries.profileConnection());
+let profileNode: any = null;
+try {
+  if (typeof client.queries.global_profile === 'function') {
+    const res = await client.queries.global_profile({ relativePath: 'ksenia.json' });
+    profileNode = res?.data?.global_profile;
+  } else if (typeof client.queries.global_profileConnection === 'function') {
+    const res = await client.queries.global_profileConnection();
+    profileNode = res?.data?.global_profileConnection?.edges?.[0]?.node;
+  } else if (typeof (client.queries as any).profile === 'function') {
+    const res = await (client.queries as any).profile({ relativePath: 'ksenia.json' });
+    profileNode = res?.data?.profile;
+  } else if (typeof (client.queries as any).profileConnection === 'function') {
+    const res = await (client.queries as any).profileConnection();
+    profileNode = res?.data?.profileConnection?.edges?.[0]?.node;
+  }
+} catch (_err) {
+  // Graceful fallback
+}
 
-const profileNode =
-  profileRes.data?.global_profileConnection?.edges?.[0]?.node ||
-  profileRes.data?.profileConnection?.edges?.[0]?.node ||
-  profileRes.data?.global_profile ||
-  profileRes.data?.profile;
+const profile = profileNode || defaultProfile;
 
-const name = profileNode?.name || 'Ksenia';
-const email = profileNode?.email || 'ksenia@visualstories.photography';
+const name = profile?.name || defaultProfile.name;
+const email = profile?.email || defaultProfile.email;
 const currentYear = new Date().getFullYear();
 ---
 
