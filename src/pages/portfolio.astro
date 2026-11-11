@@ -118,7 +118,7 @@ const categoryData = CATEGORIES.map((cat) => {
     <!-- Fixed Screen-Spanning Tabletop Backdrop Overlay -->
     <div
       id="deck-tabletop-overlay"
-      class="fixed inset-0 bg-luxury-base/90 backdrop-blur-md z-40 opacity-0 pointer-events-none transition-opacity duration-500 ease-out"
+      class="fixed inset-0 bg-luxury-base/90 backdrop-blur-md z-[55] opacity-0 pointer-events-none transition-opacity duration-500 ease-out"
       aria-hidden="true"
     ></div>
 
@@ -171,8 +171,8 @@ const categoryData = CATEGORIES.map((cat) => {
           overlay.classList.add('opacity-100', 'pointer-events-auto');
         }
 
-        // Lock background body scroll to prevent underlying page shifts
-        document.body.classList.add('overflow-hidden');
+        // Lock background body scroll & suppress underlying mobile chrome
+        document.body.classList.add('deck-active-open', 'overflow-hidden');
 
         // Reset scroll position of the expanded container to top
         targetDeck.scrollTop = 0;
@@ -195,8 +195,8 @@ const categoryData = CATEGORIES.map((cat) => {
           overlay.classList.remove('opacity-100', 'pointer-events-auto');
         }
 
-        // Unlock background body scroll
-        document.body.classList.remove('overflow-hidden');
+        // Unlock background body scroll & restore underlying mobile chrome
+        document.body.classList.remove('deck-active-open', 'overflow-hidden');
 
         // Cleanly restore viewport scroll position
         window.scrollTo({ top: savedScrollY, behavior: 'instant' });
@@ -205,15 +205,59 @@ const categoryData = CATEGORIES.map((cat) => {
         current.focus();
       }
 
-      // Attach event listeners to decks
+      // 1. Direct Close Listeners: attach direct click & touchend handlers to all close buttons
+      const closeButtons = document.querySelectorAll<HTMLElement>('.fold-deck-btn, [data-close-deck]');
+      closeButtons.forEach((btn) => {
+        const handleCloseAction = (e: Event) => {
+          e.preventDefault();
+          e.stopPropagation();
+          closeDeck();
+        };
+        btn.addEventListener('click', handleCloseAction);
+        btn.addEventListener('touchend', handleCloseAction, { passive: false });
+      });
+
+      // 2. Attach robust event listeners to decks
       decks.forEach((deck) => {
+        let touchDidMove = false;
+
+        deck.addEventListener('touchstart', () => {
+          touchDidMove = false;
+        }, { passive: true });
+
+        deck.addEventListener('touchmove', () => {
+          touchDidMove = true;
+        }, { passive: true });
+
+        // Touch event handler for mobile devices
+        deck.addEventListener('touchend', (e) => {
+          if (touchDidMove) return;
+
+          // If deck is active: allow close button or dealt card taps
+          if (deck.classList.contains('active-deck')) {
+            const target = e.target as HTMLElement;
+            if (target.closest('.fold-deck-btn') || target.closest('[data-close-deck]')) {
+              e.preventDefault();
+              e.stopPropagation();
+              closeDeck();
+            }
+            return;
+          }
+
+          // If closed: expand on mobile tap
+          e.preventDefault();
+          e.stopPropagation();
+          openDeck(deck);
+        });
+
+        // Click event handler for desktop & mouse interactions
         deck.addEventListener('click', (e) => {
           const target = e.target as HTMLElement;
 
           // If deck is active:
           if (deck.classList.contains('active-deck')) {
             // Check if fold button was clicked
-            if (target.closest('.fold-deck-btn')) {
+            if (target.closest('.fold-deck-btn') || target.closest('[data-close-deck]')) {
               e.preventDefault();
               e.stopPropagation();
               closeDeck();
@@ -228,6 +272,7 @@ const categoryData = CATEGORIES.map((cat) => {
                 const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement | null;
                 const lightbox = document.getElementById('collage-lightbox');
                 if (lightbox && lightboxImg) {
+                  e.preventDefault();
                   e.stopPropagation();
                   lightboxImg.src = img.src;
                   lightboxImg.alt = img.alt || '';
@@ -242,7 +287,9 @@ const categoryData = CATEGORIES.map((cat) => {
             return;
           }
 
-          // If deck is closed: click expands it
+          // If deck is closed: strictly prevent default navigation and expand in-place
+          e.preventDefault();
+          e.stopPropagation();
           openDeck(deck);
         });
 
@@ -250,12 +297,13 @@ const categoryData = CATEGORIES.map((cat) => {
         deck.addEventListener('keydown', (e) => {
           if (!deck.classList.contains('active-deck') && (e.key === 'Enter' || e.key === ' ')) {
             e.preventDefault();
+            e.stopPropagation();
             openDeck(deck);
           }
         });
       });
 
-      // Escape key listener to fold deck
+      // 3. Escape key listener to fold deck
       const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Escape' || e.key === 'Esc') {
           // Check if lightbox is open first
@@ -271,12 +319,30 @@ const categoryData = CATEGORIES.map((cat) => {
       };
       window.addEventListener('keydown', handleKeyDown);
 
-      // Backdrop overlay click listener to fold deck
+      // 4. Backdrop overlay click and touch listeners to fold deck
       if (overlay) {
-        overlay.addEventListener('click', () => {
+        const handleOverlayClose = (e: Event) => {
+          e.preventDefault();
+          e.stopPropagation();
           if (activeDeck) closeDeck();
-        });
+        };
+        overlay.addEventListener('click', handleOverlayClose);
+        overlay.addEventListener('touchend', handleOverlayClose, { passive: false });
       }
+
+      // 5. URL Query parameter resilience: auto-expand deck if ?category= is present in URL
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const categoryParam = urlParams.get('category');
+        if (categoryParam) {
+          const targetCategoryDeck = Array.from(decks).find(
+            (d) => (d.getAttribute('data-deck-target') || '').toLowerCase() === categoryParam.toLowerCase()
+          );
+          if (targetCategoryDeck) {
+            openDeck(targetCategoryDeck);
+          }
+        }
+      } catch (_e) {}
 
       // Cleanup on view transitions
       document.addEventListener('astro:before-swap', () => {

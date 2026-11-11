@@ -42,29 +42,40 @@ const displayTotal = totalExposures > 0 ? totalExposures : allImages.length;
   aria-label={`${titleEn} category deck`}
   tabindex="0"
 >
+  <!-- Floating Mobile Close FAB Button (Always visible on mobile viewports when .active-deck) -->
+  <button
+    type="button"
+    class="fold-deck-btn fold-deck-mobile-fab hidden fixed top-[calc(0.75rem+env(safe-area-inset-top,0px))] right-3.5 z-[90] w-11 h-11 rounded-full border border-luxury-taupe/50 bg-luxury-base/95 text-luxury-cream hover:bg-luxury-crimson hover:border-luxury-crimson shadow-[0_4px_25px_rgba(0,0,0,0.9)] flex items-center justify-center cursor-pointer active:scale-90 transition-transform duration-150"
+    aria-label="Close tabletop deck"
+    data-close-deck="true"
+  >
+    <X class="w-5 h-5 stroke-[2.2]" />
+  </button>
+
   <!-- Expanded Tabletop Header & Sticky Close Button (shown only when .active-deck) -->
-  <div class="deck-expanded-header hidden sticky top-0 z-30 w-full bg-luxury-base/90 backdrop-blur-md border-b border-luxury-taupe/20 pt-3 pb-4 px-2 sm:px-6 mb-6">
-    <div class="flex items-center justify-between w-full max-w-6xl mx-auto">
-      <div class="flex flex-col">
-        <span class="text-[10px] font-mono uppercase tracking-[0.3em] text-luxury-taupe flex items-center gap-1.5">
-          <Layers class="w-3.5 h-3.5 text-luxury-crimson" />
+  <div class="deck-expanded-header hidden sticky top-0 z-[70] w-full bg-luxury-base/95 backdrop-blur-xl border-b border-luxury-taupe/20 pt-[calc(0.75rem+env(safe-area-inset-top,0px))] pb-3.5 px-3 sm:px-6 mb-6">
+    <div class="flex items-center justify-between w-full max-w-6xl mx-auto gap-3">
+      <div class="flex flex-col min-w-0 pr-2">
+        <span class="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.25em] sm:tracking-[0.3em] text-luxury-taupe flex items-center gap-1.5 truncate">
+          <Layers class="w-3.5 h-3.5 text-luxury-crimson flex-shrink-0" />
           <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>TABLETOP DECK ARCHIVE</span>
           <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>РАЗВЕРНУТАЯ СЕРИЯ</span>
         </span>
-        <h2 class="font-serif text-2xl sm:text-4xl text-luxury-cream font-normal tracking-tight mt-1">
+        <h2 class="font-serif text-xl sm:text-3xl lg:text-4xl text-luxury-cream font-normal tracking-tight mt-0.5 truncate">
           <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{titleEn}</span>
           <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{titleRu}</span>
         </h2>
-        <p class="text-xs font-mono uppercase tracking-widest text-luxury-taupe/80 mt-1">
+        <p class="text-[11px] sm:text-xs font-mono uppercase tracking-widest text-luxury-taupe/80 mt-0.5 truncate">
           {displayTotal} <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('deck.exposures')}</span><span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('deck.exposures')}</span> · 35mm Analog
         </p>
       </div>
 
-      <!-- Close / Fold Deck Button -->
+      <!-- Close / Fold Deck Button (Tablet / Desktop Pill) -->
       <button
         type="button"
-        class="fold-deck-btn group/btn flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full border border-luxury-taupe/40 bg-luxury-base/95 hover:bg-luxury-crimson text-luxury-taupe hover:text-luxury-cream hover:border-luxury-crimson transition-all duration-300 shadow-2xl cursor-pointer"
+        class="fold-deck-btn group/btn hidden sm:flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full border border-luxury-taupe/40 bg-luxury-base/95 hover:bg-luxury-crimson text-luxury-taupe hover:text-luxury-cream hover:border-luxury-crimson transition-all duration-300 shadow-2xl cursor-pointer flex-shrink-0"
         aria-label="Fold deck (Close)"
+        data-close-deck="true"
       >
         <X class="w-4 h-4 stroke-[2] transition-transform duration-300 group-hover/btn:rotate-90" />
         <span class="text-xs font-mono uppercase tracking-wider font-medium">
@@ -72,6 +83,16 @@ const displayTotal = totalExposures > 0 ? totalExposures : allImages.length;
           <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('deck.foldDeck')}</span>
           <span class="text-[10px] text-luxury-taupe/60 ml-1 font-mono">(Esc)</span>
         </span>
+      </button>
+
+      <!-- In-Header Close Button for Mobile Screens (In addition to Floating FAB) -->
+      <button
+        type="button"
+        class="fold-deck-btn sm:hidden w-10 h-10 rounded-full border border-luxury-taupe/40 bg-luxury-base/95 text-luxury-cream hover:bg-luxury-crimson hover:border-luxury-crimson flex items-center justify-center cursor-pointer flex-shrink-0 active:scale-90 transition-all shadow-lg"
+        aria-label="Fold deck (Close)"
+        data-close-deck="true"
+      >
+        <X class="w-5 h-5 stroke-[2]" />
       </button>
     </div>
   </div>
@@ -255,15 +276,17 @@ const displayTotal = totalExposures > 0 ? totalExposures : allImages.length;
   .category-deck-card.active-deck {
     position: fixed !important;
     inset: 0 !important;
-    z-index: 50 !important;
+    z-index: 60 !important;
     width: 100vw !important;
     max-width: 100vw !important;
     height: 100dvh !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    padding: 0 1rem 4rem 1rem !important;
+    padding: 0 1rem 5rem 1rem !important;
     cursor: default !important;
-    background: transparent !important;
+    background-color: #0B0C0E !important;
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
   @media (min-width: 1024px) {
@@ -275,6 +298,18 @@ const displayTotal = totalExposures > 0 ? totalExposures : allImages.length;
   .category-deck-card.active-deck .deck-expanded-header {
     display: flex !important;
     animation: fadeInExpandedHeader 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .category-deck-card:not(.active-deck) .fold-deck-mobile-fab {
+    display: none !important;
+  }
+  .category-deck-card.active-deck .fold-deck-mobile-fab {
+    display: flex !important;
+  }
+  @media (min-width: 640px) {
+    .category-deck-card.active-deck .fold-deck-mobile-fab {
+      display: none !important;
+    }
   }
 
   .category-deck-card.active-deck .deck-cards-wrapper {
