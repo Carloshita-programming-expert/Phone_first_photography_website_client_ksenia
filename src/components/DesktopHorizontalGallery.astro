@@ -1,6 +1,7 @@
 ---
 import { getCloudinaryUrl } from '../utils/cloudinary';
 import { Camera, MapPin, Film, Calendar } from 'lucide-astro';
+import { useTranslations } from '../i18n/ui';
 
 export interface PostItem {
   id?: string;
@@ -21,6 +22,9 @@ interface Props {
 }
 
 const { posts = [], currentLang = 'en' } = Astro.props;
+
+const tEn = useTranslations('en');
+const tRu = useTranslations('ru');
 
 // Flatten all images into a sequenced filmstrip series
 const filmstripFrames = posts.flatMap((post, postIdx) => {
@@ -49,15 +53,28 @@ const filmstripFrames = posts.flatMap((post, postIdx) => {
     <div class="flex items-center gap-3">
       <span class="flex items-center gap-1.5 text-luxury-taupe">
         <Film class="w-3.5 h-3.5 text-luxury-taupe" />
-        <span>35mm Analog Contact Strip</span>
+        <span>
+          <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('filmstrip.stripBadge')}</span>
+          <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('filmstrip.stripBadge')}</span>
+        </span>
       </span>
       <span class="text-luxury-taupe/40">|</span>
-      <span>ISO 400 · Natural Grain</span>
+      <span>
+        <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('filmstrip.isoBadge')}</span>
+        <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('filmstrip.isoBadge')}</span>
+      </span>
     </div>
     <div class="flex items-center gap-3 text-luxury-taupe">
-      <span>{filmstripFrames.length} Curated Exposures</span>
+      <span>
+        {filmstripFrames.length}{' '}
+        <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('filmstrip.curatedExposures')}</span>
+        <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('filmstrip.curatedExposures')}</span>
+      </span>
       <span class="text-luxury-taupe/40">|</span>
-      <span class="text-luxury-taupe">Drag / Wheel ↔ Film Reel</span>
+      <span class="text-luxury-taupe">
+        <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('filmstrip.dragWheelHint')}</span>
+        <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('filmstrip.dragWheelHint')}</span>
+      </span>
     </div>
   </div>
 

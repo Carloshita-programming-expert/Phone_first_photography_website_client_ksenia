@@ -3,8 +3,13 @@ import Layout from '../layouts/Layout.astro';
 import { getCloudinaryUrl } from '../utils/cloudinary';
 import { client } from '../../tina/__generated__/client';
 import { Mail, Camera, MapPin, Film, Sparkles } from 'lucide-astro';
+import { useTranslations } from '../i18n/ui';
 
 const currentLang = (Astro.url.searchParams.get('lang') as 'en' | 'ru') || 'en';
+
+const t = useTranslations(currentLang);
+const tEn = useTranslations('en');
+const tRu = useTranslations('ru');
 
 const defaultProfile = {
   name: 'Ksenia',
@@ -52,8 +57,8 @@ const profileImage =
 ---
 
 <Layout
-  title={`${name} | Profile & Contact`}
-  description={`Editorial profile and contact info for ${name}, visual artist and analog photographer.`}
+  title={t('profile.title')}
+  description={t('profile.description')}
   currentLang={currentLang}
   activeTab="about"
 >
@@ -70,24 +75,30 @@ const profileImage =
           class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
         />
       </div>
-      <div class="absolute bottom-1 right-2 w-6 h-6 rounded-full bg-luxury-crimson border-2 border-luxury-base flex items-center justify-center shadow-lg" title="Available for assignments">
+      <div
+        class="absolute bottom-1 right-2 w-6 h-6 rounded-full bg-luxury-crimson border-2 border-luxury-base flex items-center justify-center shadow-lg"
+        title={currentLang === 'ru' ? tRu('profile.availableBadge') : tEn('profile.availableBadge')}
+      >
         <Sparkles class="w-3 h-3 text-luxury-cream stroke-[2.5]" />
       </div>
     </div>
 
     <!-- Name & Editorial Byline -->
     <h1 class="font-serif text-3xl sm:text-4xl text-luxury-cream font-normal tracking-tight">
-      {name}
+      <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('hero.name')}</span>
+      <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('hero.name')}</span>
     </h1>
     <div class="flex items-center gap-2 mt-2 text-xs font-mono uppercase tracking-widest text-luxury-taupe">
       <span class="flex items-center gap-1">
         <MapPin class="w-3 h-3 text-luxury-taupe" />
-        Berlin · Worldwide
+        <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('profile.location')}</span>
+        <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('profile.location')}</span>
       </span>
       <span>•</span>
       <span class="flex items-center gap-1">
         <Camera class="w-3 h-3 text-luxury-taupe" />
-        Analog Works
+        <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('profile.discipline')}</span>
+        <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('profile.discipline')}</span>
       </span>
     </div>
 
@@ -112,20 +123,28 @@ const profileImage =
       <div class="p-3.5 rounded-lg bg-luxury-base/80 border border-luxury-taupe/30 flex flex-col justify-between">
         <div class="flex items-center gap-1.5 text-luxury-taupe text-xs font-mono uppercase tracking-wider">
           <Film class="w-3.5 h-3.5 text-luxury-taupe" />
-          <span>Primary Media</span>
+          <span>
+            <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('profile.mediaHeading')}</span>
+            <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('profile.mediaHeading')}</span>
+          </span>
         </div>
         <p class="text-xs text-luxury-cream font-medium mt-1">
-          CineStill 800T · Portra 160 · Tri-X 400
+          <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('profile.mediaList')}</span>
+          <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('profile.mediaList')}</span>
         </p>
       </div>
 
       <div class="p-3.5 rounded-lg bg-luxury-base/80 border border-luxury-taupe/30 flex flex-col justify-between">
         <div class="flex items-center gap-1.5 text-luxury-taupe text-xs font-mono uppercase tracking-wider">
           <Camera class="w-3.5 h-3.5 text-luxury-taupe" />
-          <span>Apparatus</span>
+          <span>
+            <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('profile.apparatusHeading')}</span>
+            <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('profile.apparatusHeading')}</span>
+          </span>
         </div>
         <p class="text-xs text-luxury-cream font-medium mt-1">
-          Leica M6 · Hasselblad 500C/M · Pentax 67
+          <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('profile.apparatusList')}</span>
+          <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('profile.apparatusList')}</span>
         </p>
       </div>
     </div>
@@ -137,7 +156,10 @@ const profileImage =
         class="inline-flex items-center gap-2.5 px-7 py-3 rounded-full bg-luxury-cream text-luxury-base border border-luxury-taupe font-semibold text-xs uppercase tracking-widest hover:bg-luxury-crimson hover:text-luxury-cream hover:border-luxury-crimson hover:scale-105 active:scale-95 transition-all shadow-[0_0_25px_rgba(113,28,29,0.25)]"
       >
         <Mail class="w-4 h-4 stroke-[2]" />
-        <span>Initiate Inquiry</span>
+        <span>
+          <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('profile.contactBtn')}</span>
+          <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('profile.contactBtn')}</span>
+        </span>
       </a>
       <div class="mt-3 text-[11px] font-mono text-luxury-taupe">
         {email}

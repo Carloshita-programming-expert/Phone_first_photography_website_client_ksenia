@@ -4,8 +4,13 @@ import HeroProfile from '../components/HeroProfile.astro';
 import FeedPost from '../components/FeedPost.astro';
 import DesktopHorizontalGallery from '../components/DesktopHorizontalGallery.astro';
 import { client } from '../../tina/__generated__/client';
+import { useTranslations } from '../i18n/ui';
 
 const currentLang = (Astro.url.searchParams.get('lang') as 'en' | 'ru') || 'en';
+
+const t = useTranslations(currentLang);
+const tEn = useTranslations('en');
+const tRu = useTranslations('ru');
 
 let posts: any[] = [];
 try {
@@ -19,8 +24,8 @@ try {
 ---
 
 <Layout
-  title="Visual Stories | Photography Portfolio"
-  description="Curated high-end photography portfolio featuring stories from Kyoto, Iceland, Berlin, Almaty, and Milos."
+  title={t('layout.title')}
+  description={t('layout.description')}
   currentLang={currentLang}
   activeTab="home"
   snapDesktop={true}
@@ -54,13 +59,16 @@ try {
     <section class="hidden lg:block w-full" aria-label="Desktop Filmstrip Gallery">
       <div class="mb-6 flex flex-col items-center text-center px-4">
         <span class="text-xs font-mono uppercase tracking-[0.3em] text-luxury-taupe">
-          Curated Photographic Works
+          <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('filmstrip.tag')}</span>
+          <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('filmstrip.tag')}</span>
         </span>
         <h2 class="font-serif text-3xl xl:text-4xl text-luxury-cream tracking-tight font-normal mt-2">
-          The Filmstrip Archives
+          <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('filmstrip.heading')}</span>
+          <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('filmstrip.heading')}</span>
         </h2>
         <p class="text-sm text-luxury-taupe max-w-lg mx-auto mt-2 font-light leading-relaxed">
-          High-resolution 35mm and medium format captures arranged as an expansive contact sheet. Scroll horizontally using your mouse wheel.
+          <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('filmstrip.desc')}</span>
+          <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('filmstrip.desc')}</span>
         </p>
       </div>
 

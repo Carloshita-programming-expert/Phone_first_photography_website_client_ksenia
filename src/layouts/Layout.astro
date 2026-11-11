@@ -3,6 +3,7 @@ import '../styles/global.css';
 import BottomNav from '../components/BottomNav.astro';
 import TopNav from '../components/TopNav.astro';
 import GlobalFooter from '../components/GlobalFooter.astro';
+import { useTranslations } from '../i18n/ui';
 
 interface Props {
   title?: string;
@@ -13,19 +14,26 @@ interface Props {
 }
 
 const {
-  title = 'Visual Stories | Photography Portfolio',
-  description = 'High-end photography portfolio featuring curated analog shoots.',
+  title,
+  description,
   currentLang = 'en',
   activeTab,
   snapDesktop = false,
 } = Astro.props;
+
+const t = useTranslations(currentLang);
+const tEn = useTranslations('en');
+const tRu = useTranslations('ru');
+
+const resolvedTitle = title || t('layout.title');
+const resolvedDescription = description || t('layout.description');
 ---
 
 <!doctype html>
 <html lang={currentLang} class={`bg-luxury-base text-luxury-cream antialiased ${snapDesktop ? 'lg:snap-y lg:snap-mandatory snap-desktop-hero' : ''}`}>
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content={description} />
+    <meta name="description" content={resolvedDescription} />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
@@ -35,7 +43,7 @@ const {
     <meta name="theme-color" content="#0B0C0E" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>{title}</title>
+    <title>{resolvedTitle}</title>
   </head>
   <body class="min-h-screen bg-luxury-base text-luxury-cream overflow-x-hidden selection:bg-luxury-crimson selection:text-luxury-cream flex flex-col justify-between">
     <!-- Desktop Ambient Background Elements -->
@@ -54,12 +62,14 @@ const {
       <header class="sticky top-0 z-40 bg-luxury-base/90 backdrop-blur-md border-b border-luxury-taupe/20 px-4 py-3 flex items-center justify-between lg:hidden">
         <a href="/" class="flex items-center space-x-2">
           <span class="font-serif tracking-wider text-sm uppercase font-semibold text-luxury-cream">
-            Portfolio
+            <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('brand.portfolio')}</span>
+            <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('brand.portfolio')}</span>
           </span>
           <span class="w-1.5 h-1.5 rounded-full bg-luxury-crimson animate-pulse"></span>
         </a>
         <div class="text-[11px] font-mono tracking-widest text-luxury-taupe uppercase">
-          Curated Works
+          <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('brand.curatedWorks')}</span>
+          <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('brand.curatedWorks')}</span>
         </div>
       </header>
 

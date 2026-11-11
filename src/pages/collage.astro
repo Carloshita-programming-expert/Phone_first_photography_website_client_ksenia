@@ -2,8 +2,13 @@
 import Layout from '../layouts/Layout.astro';
 import MasonryGrid from '../components/MasonryGrid.astro';
 import { client } from '../../tina/__generated__/client';
+import { useTranslations } from '../i18n/ui';
 
 const currentLang = (Astro.url.searchParams.get('lang') as 'en' | 'ru') || 'en';
+
+const t = useTranslations(currentLang);
+const tEn = useTranslations('en');
+const tRu = useTranslations('ru');
 
 let posts: any[] = [];
 try {
@@ -17,21 +22,24 @@ try {
 ---
 
 <Layout
-  title="Collage | Visual Stories"
-  description="Full-archive masonry grid exhibiting analog photography studies across Europe and Asia."
+  title={t('collage.title')}
+  description={t('collage.description')}
   currentLang={currentLang}
   activeTab="grid"
 >
   <div class="w-full px-3 py-4 sm:px-6">
     <header class="mb-6 text-center">
       <span class="text-[10px] font-mono uppercase tracking-[0.2em] text-luxury-taupe">
-        Curated Archives
+        <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('collage.tag')}</span>
+        <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('collage.tag')}</span>
       </span>
       <h1 class="font-serif text-2xl sm:text-3xl text-luxury-cream tracking-tight font-medium mt-1">
-        Photographic Collage
+        <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('collage.heading')}</span>
+        <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('collage.heading')}</span>
       </h1>
       <p class="text-xs text-luxury-taupe max-w-md mx-auto mt-2 leading-relaxed">
-        A seamless composite of 35mm and medium format captures across all expeditions.
+        <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('collage.desc')}</span>
+        <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('collage.desc')}</span>
       </p>
     </header>
 

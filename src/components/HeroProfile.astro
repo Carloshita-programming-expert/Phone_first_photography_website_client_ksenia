@@ -2,12 +2,16 @@
 import { client } from '../../tina/__generated__/client';
 import { getCloudinaryUrl } from '../utils/cloudinary';
 import { Mail, Camera, MapPin, Sparkles, ChevronDown } from 'lucide-astro';
+import { useTranslations } from '../i18n/ui';
 
 interface Props {
   currentLang?: 'en' | 'ru';
 }
 
 const { currentLang = 'en' } = Astro.props;
+
+const tEn = useTranslations('en');
+const tRu = useTranslations('ru');
 
 const defaultProfile = {
   name: 'Ksenia',
@@ -76,7 +80,7 @@ const portrait = profile?.portrait || profile?.profile_image || defaultProfile.p
       <!-- Available indicator -->
       <div
         class="absolute bottom-1 right-2 w-6 h-6 rounded-full bg-luxury-crimson border-2 border-luxury-base flex items-center justify-center shadow-lg"
-        title="Available for commissions"
+        title={currentLang === 'ru' ? tRu('hero.availableBadge') : tEn('hero.availableBadge')}
       >
         <Sparkles class="w-3 h-3 text-luxury-cream stroke-[2.5]" />
       </div>
@@ -84,17 +88,20 @@ const portrait = profile?.portrait || profile?.profile_image || defaultProfile.p
 
     <!-- Editorial Identity -->
     <h1 class="font-serif text-3xl sm:text-4xl lg:text-5xl text-luxury-cream font-normal tracking-tight">
-      {name}
+      <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('hero.name')}</span>
+      <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('hero.name')}</span>
     </h1>
     <div class="flex items-center gap-2 mt-2 text-xs font-mono uppercase tracking-widest text-luxury-taupe">
       <span class="flex items-center gap-1">
         <MapPin class="w-3 h-3 text-luxury-taupe" />
-        Berlin · Worldwide
+        <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('hero.location')}</span>
+        <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('hero.location')}</span>
       </span>
       <span>•</span>
       <span class="flex items-center gap-1">
         <Camera class="w-3 h-3 text-luxury-taupe" />
-        Analog Works
+        <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('hero.discipline')}</span>
+        <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('hero.discipline')}</span>
       </span>
     </div>
 
@@ -125,9 +132,12 @@ const portrait = profile?.portrait || profile?.profile_image || defaultProfile.p
       <a
         href="#photography-section"
         class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-luxury-base border border-luxury-taupe/40 text-[10px] font-mono uppercase tracking-[0.2em] text-luxury-cream hover:border-luxury-crimson hover:text-luxury-cream active:scale-95 transition-all shadow-[0_2px_10px_rgba(0,0,0,0.5)] group"
-        aria-label="Scroll down to curated photography"
+        aria-label={currentLang === 'ru' ? tRu('hero.ariaScroll') : tEn('hero.ariaScroll')}
       >
-        <span class="text-luxury-cream font-medium">CURATED PHOTOGRAPHY</span>
+        <span class="text-luxury-cream font-medium">
+          <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('hero.scrollCue')}</span>
+          <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('hero.scrollCue')}</span>
+        </span>
         <span class="text-luxury-crimson text-xs group-hover:translate-y-0.5 transition-transform">↓</span>
       </a>
     </div>
@@ -139,7 +149,10 @@ const portrait = profile?.portrait || profile?.profile_image || defaultProfile.p
         class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-luxury-cream text-luxury-base border border-luxury-taupe font-semibold text-xs uppercase tracking-widest hover:bg-luxury-crimson hover:text-luxury-cream hover:border-luxury-crimson hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(113,28,29,0.25)]"
       >
         <Mail class="w-3.5 h-3.5 stroke-[2]" />
-        <span>Initiate Inquiry</span>
+        <span>
+          <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('hero.contactBtn')}</span>
+          <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('hero.contactBtn')}</span>
+        </span>
       </a>
     </div>
   </div>
@@ -149,10 +162,11 @@ const portrait = profile?.portrait || profile?.profile_image || defaultProfile.p
     <a
       href="#photography-section"
       class="flex flex-col items-center gap-2 group cursor-pointer transition-colors hover:text-luxury-cream"
-      aria-label="Scroll down to photography"
+      aria-label={currentLang === 'ru' ? tRu('hero.ariaScroll') : tEn('hero.ariaScroll')}
     >
       <span class="text-[10px] font-mono uppercase tracking-[0.3em] text-luxury-taupe group-hover:text-luxury-cream transition-colors">
-        CURATED PHOTOGRAPHY
+        <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('hero.scrollCue')}</span>
+        <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('hero.scrollCue')}</span>
       </span>
       <ChevronDown class="w-4 h-4 text-luxury-taupe group-hover:text-luxury-crimson transition-transform duration-300 group-hover:translate-y-1 animate-bounce" />
     </a>

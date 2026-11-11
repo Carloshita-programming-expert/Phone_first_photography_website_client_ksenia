@@ -1,10 +1,15 @@
 ---
+import { useTranslations } from '../i18n/ui';
+
 interface Props {
   currentLang?: 'en' | 'ru';
   activeTab?: 'home' | 'grid' | 'about';
 }
 
 const { currentLang = 'en', activeTab } = Astro.props;
+
+const tEn = useTranslations('en');
+const tRu = useTranslations('ru');
 
 const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
 const resolvedActiveTab: 'home' | 'grid' | 'about' =
@@ -22,11 +27,13 @@ const resolvedActiveTab: 'home' | 'grid' | 'about' =
 >
   <!-- Studio Brand -->
   <a href="/" class="flex items-center gap-3 group">
-    <span class="font-serif text-lg tracking-wider font-medium text-luxury-cream group-hover:text-luxury-taupe transition-colors">
-      KSENIA
+    <span class="font-serif text-lg tracking-wider font-medium text-luxury-cream group-hover:text-luxury-taupe transition-colors uppercase">
+      <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('brand.name')}</span>
+      <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('brand.name')}</span>
     </span>
     <span class="text-[11px] font-mono uppercase tracking-[0.25em] text-luxury-taupe border-l border-luxury-taupe/30 pl-3">
-      Visual Stories
+      <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('brand.tagline')}</span>
+      <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('brand.tagline')}</span>
     </span>
     <span class="w-1.5 h-1.5 rounded-full bg-luxury-crimson animate-pulse"></span>
   </a>
@@ -42,7 +49,8 @@ const resolvedActiveTab: 'home' | 'grid' | 'about' =
       }`}
       aria-current={resolvedActiveTab === 'home' ? 'page' : undefined}
     >
-      Feed
+      <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('nav.feed')}</span>
+      <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('nav.feed')}</span>
       {resolvedActiveTab === 'home' && (
         <span class="absolute -bottom-1 left-0 w-full h-[2px] bg-luxury-crimson rounded-full"></span>
       )}
@@ -57,7 +65,8 @@ const resolvedActiveTab: 'home' | 'grid' | 'about' =
       }`}
       aria-current={resolvedActiveTab === 'grid' ? 'page' : undefined}
     >
-      Collage
+      <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('nav.collage')}</span>
+      <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('nav.collage')}</span>
       {resolvedActiveTab === 'grid' && (
         <span class="absolute -bottom-1 left-0 w-full h-[2px] bg-luxury-crimson rounded-full"></span>
       )}
@@ -72,7 +81,8 @@ const resolvedActiveTab: 'home' | 'grid' | 'about' =
       }`}
       aria-current={resolvedActiveTab === 'about' ? 'page' : undefined}
     >
-      Profile
+      <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('nav.profile')}</span>
+      <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('nav.profile')}</span>
       {resolvedActiveTab === 'about' && (
         <span class="absolute -bottom-1 left-0 w-full h-[2px] bg-luxury-crimson rounded-full"></span>
       )}
@@ -87,7 +97,8 @@ const resolvedActiveTab: 'home' | 'grid' | 'about' =
       target="_blank"
       rel="noopener noreferrer"
     >
-      CMS Admin
+      <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('nav.cmsAdmin')}</span>
+      <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('nav.cmsAdmin')}</span>
     </a>
 
     <!-- Desktop Language Switcher -->
