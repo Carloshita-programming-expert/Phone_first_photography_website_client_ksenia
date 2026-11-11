@@ -426,25 +426,6 @@ const filmstripFrames = posts.flatMap((post, postIdx) => {
         restartIdleTimer(4000);
       };
 
-      // 4. Mouse-wheel translation (converts vertical wheel delta to horizontal scroll)
-      const onWheel = (evt: WheelEvent) => {
-        cancelInertia();
-        velocity = 0;
-        stopAutoAdvance();
-        restartIdleTimer(3500);
-
-        if (evt.deltaY !== 0) {
-          const maxScrollLeft = gallery.scrollWidth - gallery.clientWidth;
-          const atStart = gallery.scrollLeft <= 0 && evt.deltaY < 0;
-          const atEnd = gallery.scrollLeft >= maxScrollLeft - 2 && evt.deltaY > 0;
-
-          if (!atStart && !atEnd) {
-            evt.preventDefault();
-            gallery.scrollLeft += evt.deltaY;
-          }
-        }
-      };
-
       // Suppress unintentional click navigation if a drag gesture occurred
       const onClickCapture = (e: MouseEvent) => {
         if (hasDragged) {
@@ -465,7 +446,6 @@ const filmstripFrames = posts.flatMap((post, postIdx) => {
       gallery.addEventListener('touchstart', onTouchStart, { passive: true });
       gallery.addEventListener('touchend', onTouchEnd, { passive: true });
       gallery.addEventListener('touchcancel', onTouchEnd, { passive: true });
-      gallery.addEventListener('wheel', onWheel, { passive: false });
       gallery.addEventListener('click', onClickCapture, true);
 
       // Initialize auto-advance ticker
@@ -494,7 +474,6 @@ const filmstripFrames = posts.flatMap((post, postIdx) => {
           gallery.removeEventListener('touchstart', onTouchStart);
           gallery.removeEventListener('touchend', onTouchEnd);
           gallery.removeEventListener('touchcancel', onTouchEnd);
-          gallery.removeEventListener('wheel', onWheel);
           gallery.removeEventListener('click', onClickCapture, true);
         },
       };

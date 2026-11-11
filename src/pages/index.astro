@@ -34,7 +34,7 @@ try {
   <HeroProfile currentLang={currentLang} />
 
   <!-- Photography Works Section below the Hero Profile -->
-  <div id="photography-section" class="w-full pt-8 sm:pt-12 border-t border-luxury-taupe/20 lg:snap-start">
+  <div id="photography-section" class="w-full pt-8 sm:pt-12 border-t border-luxury-taupe/20">
     <!-- Mobile Viewport: Instagram-style vertical scroll-snap feed (block lg:hidden) -->
     <section class="block lg:hidden w-full flex flex-col" aria-label="Mobile Photography Feed">
       {posts.map((post, index) => (
@@ -55,8 +55,12 @@ try {
       ))}
     </section>
 
-    <!-- Desktop Viewport: Horizontal Scroll Filmstrip Gallery (hidden lg:block) -->
-    <section class="hidden lg:block w-full" aria-label="Desktop Filmstrip Gallery">
+    <!-- Desktop Viewport: Horizontal Scroll Filmstrip Gallery (hidden lg:flex) -->
+    <section
+      class="hidden lg:flex w-full min-h-[100dvh] flex-col justify-center snap-center lg:snap-center"
+      style="scroll-snap-align: center;"
+      aria-label="Desktop Filmstrip Gallery"
+    >
       <div class="mb-6 flex flex-col items-center text-center px-4">
         <span class="text-xs font-mono uppercase tracking-[0.3em] text-luxury-taupe">
           <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('filmstrip.tag')}</span>

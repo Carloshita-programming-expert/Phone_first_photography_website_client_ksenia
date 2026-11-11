@@ -39,11 +39,11 @@ export const ui = {
     // Desktop Filmstrip / Archives Section on Index
     'filmstrip.tag': 'Curated Photographic Works',
     'filmstrip.heading': 'The Filmstrip Archives',
-    'filmstrip.desc': 'High-resolution 35mm and medium format captures arranged as an expansive contact sheet. Drag or scroll horizontally.',
+    'filmstrip.desc': 'High-resolution 35mm and medium format captures arranged as an expansive contact sheet. Drag horizontally to explore.',
     'filmstrip.stripBadge': '35mm Analog Contact Strip',
     'filmstrip.isoBadge': 'ISO 400 · Natural Grain',
     'filmstrip.curatedExposures': 'Curated Exposures',
-    'filmstrip.dragWheelHint': 'Drag / Wheel ↔ Film Reel',
+    'filmstrip.dragWheelHint': 'Drag ↔ Film Reel',
     'filmstrip.exp': 'EXP',
 
     // Collage Page
@@ -105,11 +105,11 @@ export const ui = {
     // Desktop Filmstrip / Archives Section on Index
     'filmstrip.tag': 'Избранные авторские серии',
     'filmstrip.heading': 'Пленочный архив',
-    'filmstrip.desc': 'Кадры высокого разрешения на 35мм и средний формат, оформленные в виде контактного листа. Перетягивайте мышью или крутите колесико.',
+    'filmstrip.desc': 'Кадры высокого разрешения на 35мм и средний формат, оформленные в виде контактного листа. Перетягивайте мышью для просмотра.',
     'filmstrip.stripBadge': '35мм Аналоговый контактный лист',
     'filmstrip.isoBadge': 'ISO 400 · Естественное зерно',
     'filmstrip.curatedExposures': 'Экспозиций в архиве',
-    'filmstrip.dragWheelHint': 'Тянуть / Колесико ↔ Пленка',
+    'filmstrip.dragWheelHint': 'Тянуть ↔ Пленка',
     'filmstrip.exp': 'КАДР',
 
     // Collage Page
