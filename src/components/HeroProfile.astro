@@ -49,11 +49,11 @@ const portrait = profile?.portrait || profile?.profile_image || defaultProfile.p
 ---
 
 <section
-  class="hero-profile min-h-screen w-full flex flex-col justify-between items-center text-center px-4 py-8 sm:py-12 lg:py-16 relative lg:snap-start lg:snap-always"
+  class="hero-profile min-h-screen min-h-[100dvh] w-full flex flex-col justify-between items-center text-center px-4 pt-4 sm:pt-8 lg:pt-16 pb-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:pb-12 relative lg:snap-start lg:snap-always"
   aria-label="Photographer Profile"
 >
-  <!-- Spacer for top balance -->
-  <div></div>
+  <!-- Spacer for top balance on desktop -->
+  <div class="hidden lg:block"></div>
 
   <!-- Central Editorial Profile Content -->
   <div class="w-full max-w-xl mx-auto flex flex-col items-center">
@@ -120,8 +120,20 @@ const portrait = profile?.portrait || profile?.profile_image || defaultProfile.p
       </p>
     </div>
 
+    <!-- Mobile Editorial Pill Scroll Cue: Repositioned directly beneath bio text block -->
+    <div class="block lg:hidden mt-4">
+      <a
+        href="#photography-section"
+        class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-luxury-base border border-luxury-taupe/40 text-[10px] font-mono uppercase tracking-[0.2em] text-luxury-cream hover:border-luxury-crimson hover:text-luxury-cream active:scale-95 transition-all shadow-[0_2px_10px_rgba(0,0,0,0.5)] group"
+        aria-label="Scroll down to curated photography"
+      >
+        <span class="text-luxury-cream font-medium">CURATED PHOTOGRAPHY</span>
+        <span class="text-luxury-crimson text-xs group-hover:translate-y-0.5 transition-transform">↓</span>
+      </a>
+    </div>
+
     <!-- Contact Button -->
-    <div class="mt-7">
+    <div class="mt-4 sm:mt-7">
       <a
         href={`mailto:${email}?subject=Commission%20%2F%20Print%20Inquiry`}
         class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-luxury-cream text-luxury-base border border-luxury-taupe font-semibold text-xs uppercase tracking-widest hover:bg-luxury-crimson hover:text-luxury-cream hover:border-luxury-crimson hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(113,28,29,0.25)]"
@@ -132,8 +144,8 @@ const portrait = profile?.portrait || profile?.profile_image || defaultProfile.p
     </div>
   </div>
 
-  <!-- Bottom Scroll Cue: Prompt to view curated photography below -->
-  <div class="w-full flex flex-col items-center pt-8 pb-4 text-luxury-taupe">
+  <!-- Desktop Bottom Scroll Cue: Prompt to view curated photography below (Desktop Only) -->
+  <div class="w-full hidden lg:flex flex-col items-center pt-8 pb-4 text-luxury-taupe">
     <a
       href="#photography-section"
       class="flex flex-col items-center gap-2 group cursor-pointer transition-colors hover:text-luxury-cream"
