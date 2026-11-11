@@ -57,13 +57,13 @@ const filmstripFrames = posts.flatMap((post, postIdx) => {
     <div class="flex items-center gap-3 text-luxury-taupe">
       <span>{filmstripFrames.length} Curated Exposures</span>
       <span class="text-luxury-taupe/40">|</span>
-      <span class="text-luxury-taupe">Mouse Wheel ↔ Horizontal Scroll</span>
+      <span class="text-luxury-taupe">Drag / Wheel ↔ Film Reel</span>
     </div>
   </div>
 
   <!-- Main Horizontal Scroll Container -->
   <div
-    class="desktop-horizontal-gallery flex flex-row overflow-x-auto gap-6 sm:gap-8 px-8 py-8 items-stretch no-scrollbar scroll-smooth focus:outline-none"
+    class="desktop-horizontal-gallery flex flex-row overflow-x-auto gap-6 sm:gap-8 px-8 py-8 items-stretch no-scrollbar scroll-smooth focus:outline-none cursor-grab select-none"
     tabindex="0"
     role="region"
     aria-label="Horizontal Photography Filmstrip"
@@ -155,22 +155,183 @@ const filmstripFrames = posts.flatMap((post, postIdx) => {
 </div>
 
 <script>
-  // Mouse-wheel translation: converts vertical mouse wheel scroll to horizontal scroll
+  interface GalleryInstance {
+    destroy: () => void;
+  }
+
+  // Active instances registry for unmount / Astro view transitions cleanup
+  const activeGalleries: GalleryInstance[] = [];
+
+  function cleanupActiveGalleries() {
+    while (activeGalleries.length > 0) {
+      const instance = activeGalleries.pop();
+      if (instance) {
+        instance.destroy();
+      }
+    }
+  }
+
   function setupDesktopHorizontalGallery() {
+    cleanupActiveGalleries();
+
     const galleries = document.querySelectorAll<HTMLElement>('.desktop-horizontal-gallery');
 
     galleries.forEach((gallery) => {
-      // Prevent duplicate event listeners
-      if (gallery.dataset.wheelInitialized === 'true') return;
-      gallery.dataset.wheelInitialized = 'true';
+      let isDown = false;
+      let startX = 0;
+      let lastX = 0;
+      let hasDragged = false;
+      let intervalId: number | null = null;
+      let idleTimer: number | null = null;
+      let isHovered = false;
+      let isTouchInteracting = false;
+      let touchResetTimeout: number | null = null;
 
-      gallery.addEventListener('wheel', (evt: WheelEvent) => {
-        // Only intercept if there's vertical scroll delta and the element is horizontally scrollable
+      // 1. Auto-Advance Ticker (5-second interval, smooth card scrolling with wrap)
+      const startAutoAdvance = () => {
+        if (intervalId !== null) return;
+        intervalId = window.setInterval(() => {
+          if (isDown || isHovered || isTouchInteracting) return;
+          const firstCard = gallery.querySelector<HTMLElement>('[data-film-frame]');
+          const cardWidth = firstCard ? firstCard.offsetWidth + 32 : 450;
+          const maxScrollLeft = gallery.scrollWidth - gallery.clientWidth;
+
+          // Wrap smoothly back to index 0 when at or nearing the end
+          if (gallery.scrollLeft >= maxScrollLeft - 16) {
+            gallery.scrollTo({ left: 0, behavior: 'smooth' });
+          } else {
+            gallery.scrollBy({ left: cardWidth, behavior: 'smooth' });
+          }
+        }, 5000);
+      };
+
+      const stopAutoAdvance = () => {
+        if (intervalId !== null) {
+          clearInterval(intervalId);
+          intervalId = null;
+        }
+      };
+
+      const restartIdleTimer = (delay = 3000) => {
+        if (idleTimer !== null) {
+          clearTimeout(idleTimer);
+          idleTimer = null;
+        }
+        idleTimer = window.setTimeout(() => {
+          if (!isDown && !isHovered && !isTouchInteracting) {
+            startAutoAdvance();
+          }
+        }, delay);
+      };
+
+      // 2. Mouse Click-and-Drag Controller (cursor grab/grabbing & smooth 1:1 displacement)
+      const onMouseDown = (e: MouseEvent) => {
+        // Only accept primary mouse click and ignore touch-synthesized mouse events
+        if (isTouchInteracting || e.button !== 0) return;
+
+        isDown = true;
+        hasDragged = false;
+        startX = e.pageX;
+        lastX = e.pageX;
+
+        // Visual grab state toggle
+        gallery.classList.remove('cursor-grab');
+        gallery.classList.add('cursor-grabbing');
+        gallery.style.cursor = 'grabbing';
+        gallery.style.scrollBehavior = 'auto'; // Instantaneous 1:1 displacement during drag
+
+        stopAutoAdvance();
+        if (idleTimer !== null) {
+          clearTimeout(idleTimer);
+          idleTimer = null;
+        }
+      };
+
+      const onMouseMove = (e: MouseEvent) => {
+        if (!isDown) return;
+        e.preventDefault();
+
+        const delta = Math.abs(e.pageX - startX);
+        if (delta > 4) {
+          hasDragged = true;
+        }
+
+        // Direct 1:1 displacement via movementX with delta fallback
+        if (typeof e.movementX === 'number' && e.movementX !== 0) {
+          gallery.scrollLeft -= e.movementX;
+        } else {
+          const moveDelta = e.pageX - lastX;
+          gallery.scrollLeft -= moveDelta;
+        }
+        lastX = e.pageX;
+      };
+
+      const onMouseUp = () => {
+        if (!isDown) return;
+        isDown = false;
+
+        // Restore grab state and smooth scrolling
+        gallery.classList.remove('cursor-grabbing');
+        gallery.classList.add('cursor-grab');
+        gallery.style.cursor = 'grab';
+        gallery.style.scrollBehavior = 'smooth';
+
+        if (!isHovered) {
+          restartIdleTimer(3000);
+        }
+      };
+
+      const onMouseLeave = () => {
+        isHovered = false;
+        if (isDown) {
+          onMouseUp();
+        }
+        restartIdleTimer(2000);
+      };
+
+      const onMouseEnter = () => {
+        isHovered = true;
+        stopAutoAdvance();
+        if (idleTimer !== null) {
+          clearTimeout(idleTimer);
+          idleTimer = null;
+        }
+      };
+
+      // Prevent native ghost thumbnail detachment
+      const onDragStart = (e: DragEvent) => {
+        e.preventDefault();
+      };
+
+      // Native touch events passthrough: pause ticker on touch, resume on release
+      const onTouchStart = () => {
+        isTouchInteracting = true;
+        if (touchResetTimeout !== null) {
+          clearTimeout(touchResetTimeout);
+          touchResetTimeout = null;
+        }
+        stopAutoAdvance();
+        if (idleTimer !== null) {
+          clearTimeout(idleTimer);
+          idleTimer = null;
+        }
+      };
+
+      const onTouchEnd = () => {
+        touchResetTimeout = window.setTimeout(() => {
+          isTouchInteracting = false;
+        }, 500);
+        restartIdleTimer(4000);
+      };
+
+      // 3. Mouse-wheel translation (converts vertical wheel delta to horizontal scroll)
+      const onWheel = (evt: WheelEvent) => {
+        stopAutoAdvance();
+        restartIdleTimer(3500);
+
         if (evt.deltaY !== 0) {
           const maxScrollLeft = gallery.scrollWidth - gallery.clientWidth;
-          // If at left boundary and scrolling up/left, allow default page vertical scroll
           const atStart = gallery.scrollLeft <= 0 && evt.deltaY < 0;
-          // If at right boundary and scrolling down/right, allow default page vertical scroll
           const atEnd = gallery.scrollLeft >= maxScrollLeft - 2 && evt.deltaY > 0;
 
           if (!atStart && !atEnd) {
@@ -178,10 +339,67 @@ const filmstripFrames = posts.flatMap((post, postIdx) => {
             gallery.scrollLeft += evt.deltaY;
           }
         }
-      }, { passive: false });
+      };
+
+      // Suppress unintentional click navigation if a drag gesture occurred
+      const onClickCapture = (e: MouseEvent) => {
+        if (hasDragged) {
+          e.preventDefault();
+          e.stopPropagation();
+          hasDragged = false;
+        }
+      };
+
+      // Attach event listeners
+      gallery.addEventListener('mousedown', onMouseDown);
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
+      window.addEventListener('blur', onMouseUp);
+      gallery.addEventListener('mouseenter', onMouseEnter);
+      gallery.addEventListener('mouseleave', onMouseLeave);
+      gallery.addEventListener('dragstart', onDragStart);
+      gallery.addEventListener('touchstart', onTouchStart, { passive: true });
+      gallery.addEventListener('touchend', onTouchEnd, { passive: true });
+      gallery.addEventListener('touchcancel', onTouchEnd, { passive: true });
+      gallery.addEventListener('wheel', onWheel, { passive: false });
+      gallery.addEventListener('click', onClickCapture, true);
+
+      // Initialize auto-advance ticker
+      startAutoAdvance();
+
+      // Register cleanup handler for page transitions and unmount
+      const instance: GalleryInstance = {
+        destroy: () => {
+          stopAutoAdvance();
+          if (idleTimer !== null) {
+            clearTimeout(idleTimer);
+            idleTimer = null;
+          }
+          if (touchResetTimeout !== null) {
+            clearTimeout(touchResetTimeout);
+            touchResetTimeout = null;
+          }
+          gallery.removeEventListener('mousedown', onMouseDown);
+          window.removeEventListener('mousemove', onMouseMove);
+          window.removeEventListener('mouseup', onMouseUp);
+          window.removeEventListener('blur', onMouseUp);
+          gallery.removeEventListener('mouseenter', onMouseEnter);
+          gallery.removeEventListener('mouseleave', onMouseLeave);
+          gallery.removeEventListener('dragstart', onDragStart);
+          gallery.removeEventListener('touchstart', onTouchStart);
+          gallery.removeEventListener('touchend', onTouchEnd);
+          gallery.removeEventListener('touchcancel', onTouchEnd);
+          gallery.removeEventListener('wheel', onWheel);
+          gallery.removeEventListener('click', onClickCapture, true);
+        },
+      };
+
+      activeGalleries.push(instance);
     });
   }
 
   setupDesktopHorizontalGallery();
   document.addEventListener('astro:page-load', setupDesktopHorizontalGallery);
+  document.addEventListener('astro:before-swap', cleanupActiveGalleries);
+  window.addEventListener('pagehide', cleanupActiveGalleries);
 </script>
