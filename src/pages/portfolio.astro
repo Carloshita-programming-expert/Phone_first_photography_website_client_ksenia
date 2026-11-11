@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import CategoryDeck from '../components/CategoryDeck.astro';
+import Lightbox from '../components/Lightbox.astro';
 import { client } from '../../tina/__generated__/client';
 import { useTranslations } from '../i18n/ui';
 
@@ -114,8 +115,15 @@ const categoryData = CATEGORIES.map((cat) => {
       </p>
     </header>
 
+    <!-- Fixed Screen-Spanning Tabletop Backdrop Overlay -->
+    <div
+      id="deck-tabletop-overlay"
+      class="fixed inset-0 bg-luxury-base/90 backdrop-blur-md z-40 opacity-0 pointer-events-none transition-opacity duration-500 ease-out"
+      aria-hidden="true"
+    ></div>
+
     <!-- 4 Decks Grid (Deck of Cards UI) -->
-    <div class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-10 lg:gap-12 pb-12">
+    <div id="decks-container" class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-10 lg:gap-12 pb-12">
       {categoryData.map((deck) => (
         <CategoryDeck
           category={deck.key}
@@ -127,5 +135,157 @@ const categoryData = CATEGORIES.map((cat) => {
         />
       ))}
     </div>
+
+    <!-- Modal Lightbox for Full-Resolution Inspection -->
+    <Lightbox currentLang={currentLang} />
   </div>
+
+  <script>
+    function setupPortfolioDeckExpansion() {
+      const decks = document.querySelectorAll<HTMLElement>('[data-deck-target]');
+      const overlay = document.getElementById('deck-tabletop-overlay');
+      let activeDeck: HTMLElement | null = null;
+      let savedScrollY = 0;
+
+      function openDeck(targetDeck: HTMLElement) {
+        if (activeDeck === targetDeck) return;
+        if (activeDeck) closeDeck();
+
+        savedScrollY = window.scrollY || window.pageYOffset || 0;
+        activeDeck = targetDeck;
+
+        // Apply .active-deck to clicked container
+        targetDeck.classList.add('active-deck');
+        targetDeck.setAttribute('aria-expanded', 'true');
+
+        // Apply .inactive to the other 3 decks, fading them out
+        decks.forEach((d) => {
+          if (d !== targetDeck) {
+            d.classList.add('inactive');
+          }
+        });
+
+        // Activate fixed screen-spanning overlay behind active deck
+        if (overlay) {
+          overlay.classList.remove('opacity-0', 'pointer-events-none');
+          overlay.classList.add('opacity-100', 'pointer-events-auto');
+        }
+
+        // Lock background body scroll to prevent underlying page shifts
+        document.body.classList.add('overflow-hidden');
+
+        // Reset scroll position of the expanded container to top
+        targetDeck.scrollTop = 0;
+      }
+
+      function closeDeck() {
+        if (!activeDeck) return;
+
+        const current = activeDeck;
+        current.classList.remove('active-deck');
+        current.setAttribute('aria-expanded', 'false');
+        activeDeck = null;
+
+        // Remove .inactive from other decks
+        decks.forEach((d) => d.classList.remove('inactive'));
+
+        // Deactivate fixed screen-spanning overlay
+        if (overlay) {
+          overlay.classList.add('opacity-0', 'pointer-events-none');
+          overlay.classList.remove('opacity-100', 'pointer-events-auto');
+        }
+
+        // Unlock background body scroll
+        document.body.classList.remove('overflow-hidden');
+
+        // Cleanly restore viewport scroll position
+        window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+
+        // Refocus closed deck for accessibility
+        current.focus();
+      }
+
+      // Attach event listeners to decks
+      decks.forEach((deck) => {
+        deck.addEventListener('click', (e) => {
+          const target = e.target as HTMLElement;
+
+          // If deck is active:
+          if (deck.classList.contains('active-deck')) {
+            // Check if fold button was clicked
+            if (target.closest('.fold-deck-btn')) {
+              e.preventDefault();
+              e.stopPropagation();
+              closeDeck();
+              return;
+            }
+
+            // Check if dealt card was clicked - open lightbox if available
+            const dealtCard = target.closest('.dealt-card');
+            if (dealtCard) {
+              const img = dealtCard.querySelector('img');
+              if (img && img.src) {
+                const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement | null;
+                const lightbox = document.getElementById('collage-lightbox');
+                if (lightbox && lightboxImg) {
+                  e.stopPropagation();
+                  lightboxImg.src = img.src;
+                  lightboxImg.alt = img.alt || '';
+                  lightbox.classList.remove('opacity-0', 'pointer-events-none');
+                  lightbox.classList.add('opacity-100', 'pointer-events-auto');
+                  lightboxImg.classList.remove('scale-95');
+                  lightboxImg.classList.add('scale-100');
+                  lightbox.focus();
+                }
+              }
+            }
+            return;
+          }
+
+          // If deck is closed: click expands it
+          openDeck(deck);
+        });
+
+        // Keyboard accessibility: Enter or Space to open when focused
+        deck.addEventListener('keydown', (e) => {
+          if (!deck.classList.contains('active-deck') && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault();
+            openDeck(deck);
+          }
+        });
+      });
+
+      // Escape key listener to fold deck
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape' || e.key === 'Esc') {
+          // Check if lightbox is open first
+          const lightbox = document.getElementById('collage-lightbox');
+          const isLightboxOpen = lightbox && lightbox.classList.contains('opacity-100');
+          if (isLightboxOpen) return; // let lightbox handle its own close
+
+          if (activeDeck) {
+            e.preventDefault();
+            closeDeck();
+          }
+        }
+      };
+      window.addEventListener('keydown', handleKeyDown);
+
+      // Backdrop overlay click listener to fold deck
+      if (overlay) {
+        overlay.addEventListener('click', () => {
+          if (activeDeck) closeDeck();
+        });
+      }
+
+      // Cleanup on view transitions
+      document.addEventListener('astro:before-swap', () => {
+        closeDeck();
+        window.removeEventListener('keydown', handleKeyDown);
+      }, { once: true });
+    }
+
+    setupPortfolioDeckExpansion();
+    document.addEventListener('astro:page-load', setupPortfolioDeckExpansion);
+  </script>
 </Layout>

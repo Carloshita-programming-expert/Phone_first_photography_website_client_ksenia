@@ -37,6 +37,9 @@ export const ui = {
     'deck.viewSeries': 'View Category',
     'deck.exposures': 'Exposures',
     'deck.exploreStack': 'Hover / Tap to Fan Stack',
+    'deck.expandDeck': 'Click to Deal Stack',
+    'deck.foldDeck': 'Fold Deck',
+    'deck.escapeHint': 'Esc to Fold',
 
     // Layout Defaults
     'layout.title': 'Visual Stories | Photography Portfolio',
@@ -119,6 +122,9 @@ export const ui = {
     'deck.viewSeries': 'Смотреть категорию',
     'deck.exposures': 'Кадров',
     'deck.exploreStack': 'Нажмите для раскрытия',
+    'deck.expandDeck': 'Развернуть колоду',
+    'deck.foldDeck': 'Свернуть колоду',
+    'deck.escapeHint': 'Esc чтобы свернуть',
 
     // Layout Defaults
     'layout.title': 'Визуальные истории | Портфолио фотографии',

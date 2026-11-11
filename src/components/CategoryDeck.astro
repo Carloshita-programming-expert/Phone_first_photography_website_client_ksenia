@@ -1,6 +1,6 @@
 ---
 import { getCloudinaryUrl } from '../utils/cloudinary';
-import { Film, ArrowUpRight } from 'lucide-astro';
+import { Film, ArrowUpRight, X, Layers } from 'lucide-astro';
 import { useTranslations } from '../i18n/ui';
 
 interface Props {
@@ -24,96 +24,346 @@ const {
 const tEn = useTranslations('en');
 const tRu = useTranslations('ru');
 
-// Ensure at least 3 images for the physical card stack
-const stack = [
-  images[0] || 'samples/landscapes/nature-mountains',
-  images[1] || images[0] || 'samples/landscapes/beach-boat',
-  images[2] || images[1] || images[0] || 'samples/people/smiling-man',
+// Ensure fallback images if fewer than 3 images exist in prototype data
+const fallbacks = [
+  'samples/landscapes/nature-mountains',
+  'samples/landscapes/beach-boat',
+  'samples/people/smiling-man',
 ];
+
+const allImages = images.length > 0 ? images : fallbacks;
+const displayTotal = totalExposures > 0 ? totalExposures : allImages.length;
 ---
 
-<a
-  href={`/collage?category=${encodeURIComponent(category)}`}
-  class="category-deck-card group block relative w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-luxury-crimson rounded-lg"
-  aria-label={`View ${titleEn} Category Portfolio`}
+<div
+  data-deck-target={category}
+  class="category-deck-card group relative w-full select-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-luxury-crimson rounded-xl transition-all duration-500 ease-out"
+  role="region"
+  aria-label={`${titleEn} category deck`}
+  tabindex="0"
 >
-  <!-- Card Stack Container with safe padding to prevent mobile overflow -->
-  <div class="relative w-full aspect-[4/5] sm:aspect-[3/4] max-w-[340px] sm:max-w-[380px] mx-auto flex items-center justify-center py-4">
-    
-    <!-- Bottom Layer Photo (Fans out to the left on hover) -->
-    <div
-      class="absolute inset-x-6 inset-y-4 sm:inset-x-8 sm:inset-y-6 rounded-md overflow-hidden border border-luxury-taupe/30 bg-luxury-base shadow-md transition-all duration-500 ease-out -rotate-3 -translate-x-1 group-hover:-translate-x-5 sm:group-hover:-translate-x-7 group-hover:-rotate-6 group-hover:scale-[0.98] group-hover:shadow-2xl opacity-75 group-hover:opacity-100 select-none pointer-events-none"
-    >
-      <img
-        src={getCloudinaryUrl(stack[0], 'f_auto,q_auto')}
-        alt=""
-        loading="lazy"
-        decoding="async"
-        class="w-full h-full object-cover select-none pointer-events-none"
-      />
-      <div class="absolute inset-0 bg-luxury-base/30 group-hover:bg-transparent transition-colors duration-500"></div>
-    </div>
-
-    <!-- Middle Layer Photo (Fans out to the right on hover) -->
-    <div
-      class="absolute inset-x-6 inset-y-4 sm:inset-x-8 sm:inset-y-6 rounded-md overflow-hidden border border-luxury-taupe/30 bg-luxury-base shadow-md transition-all duration-500 ease-out rotate-2 translate-x-1 group-hover:translate-x-5 sm:group-hover:translate-x-7 group-hover:rotate-6 group-hover:scale-[0.98] group-hover:shadow-2xl opacity-85 group-hover:opacity-100 select-none pointer-events-none"
-    >
-      <img
-        src={getCloudinaryUrl(stack[1], 'f_auto,q_auto')}
-        alt=""
-        loading="lazy"
-        decoding="async"
-        class="w-full h-full object-cover select-none pointer-events-none"
-      />
-      <div class="absolute inset-0 bg-luxury-base/20 group-hover:bg-transparent transition-colors duration-500"></div>
-    </div>
-
-    <!-- Top Front Layer Photo (Lifts slightly upwards on hover) -->
-    <div
-      class="relative w-[calc(100%-3rem)] sm:w-[calc(100%-4rem)] aspect-[4/5] sm:aspect-[3/4] rounded-md overflow-hidden border border-luxury-taupe/40 bg-luxury-base shadow-xl transition-all duration-500 ease-out rotate-0 group-hover:-translate-y-2 group-hover:border-luxury-taupe/80 group-hover:shadow-[0_20px_45px_rgba(0,0,0,0.9)] z-10 select-none"
-    >
-      <img
-        src={getCloudinaryUrl(stack[2], 'f_auto,q_auto')}
-        alt={`${titleEn} category cover`}
-        loading="eager"
-        decoding="async"
-        class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03] select-none pointer-events-none"
-      />
-
-      <!-- Ambient Vignette & Information Overlay -->
-      <div class="absolute inset-0 bg-gradient-to-t from-luxury-base/95 via-luxury-base/30 to-transparent flex flex-col justify-between p-4 pointer-events-none">
-        <!-- Top Monogram Badge -->
-        <div class="flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-luxury-taupe">
-          <span class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-luxury-base/70 backdrop-blur-sm border border-luxury-taupe/30">
-            <Film class="w-3 h-3 text-luxury-taupe" />
-            <span>35mm</span>
-          </span>
-          <span class="w-6 h-6 rounded-full bg-luxury-base/70 backdrop-blur-sm border border-luxury-taupe/30 flex items-center justify-center text-luxury-cream group-hover:bg-luxury-crimson group-hover:text-luxury-cream group-hover:border-luxury-crimson transition-all duration-300">
-            <ArrowUpRight class="w-3.5 h-3.5" />
-          </span>
-        </div>
-
-        <!-- Bottom Category Title & Meta -->
-        <div class="text-left">
-          <h2 class="font-serif text-xl sm:text-2xl text-luxury-cream font-normal tracking-tight drop-shadow-md">
-            <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{titleEn}</span>
-            <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{titleRu}</span>
-          </h2>
-          <div class="flex items-center justify-between mt-1 text-[10px] font-mono uppercase tracking-widest text-luxury-taupe border-t border-luxury-taupe/20 pt-1.5">
-            <span>
-              <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('deck.viewSeries')}</span>
-              <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('deck.viewSeries')}</span>
-            </span>
-            {totalExposures > 0 && (
-              <span class="text-luxury-taupe/80">
-                {totalExposures}{' '}
-                <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('deck.exposures')}</span>
-                <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('deck.exposures')}</span>
-              </span>
-            )}
-          </div>
-        </div>
+  <!-- Expanded Tabletop Header & Sticky Close Button (shown only when .active-deck) -->
+  <div class="deck-expanded-header hidden sticky top-0 z-30 w-full bg-luxury-base/90 backdrop-blur-md border-b border-luxury-taupe/20 pt-3 pb-4 px-2 sm:px-6 mb-6">
+    <div class="flex items-center justify-between w-full max-w-6xl mx-auto">
+      <div class="flex flex-col">
+        <span class="text-[10px] font-mono uppercase tracking-[0.3em] text-luxury-taupe flex items-center gap-1.5">
+          <Layers class="w-3.5 h-3.5 text-luxury-crimson" />
+          <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>TABLETOP DECK ARCHIVE</span>
+          <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>РАЗВЕРНУТАЯ СЕРИЯ</span>
+        </span>
+        <h2 class="font-serif text-2xl sm:text-4xl text-luxury-cream font-normal tracking-tight mt-1">
+          <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{titleEn}</span>
+          <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{titleRu}</span>
+        </h2>
+        <p class="text-xs font-mono uppercase tracking-widest text-luxury-taupe/80 mt-1">
+          {displayTotal} <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('deck.exposures')}</span><span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('deck.exposures')}</span> · 35mm Analog
+        </p>
       </div>
+
+      <!-- Close / Fold Deck Button -->
+      <button
+        type="button"
+        class="fold-deck-btn group/btn flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full border border-luxury-taupe/40 bg-luxury-base/95 hover:bg-luxury-crimson text-luxury-taupe hover:text-luxury-cream hover:border-luxury-crimson transition-all duration-300 shadow-2xl cursor-pointer"
+        aria-label="Fold deck (Close)"
+      >
+        <X class="w-4 h-4 stroke-[2] transition-transform duration-300 group-hover/btn:rotate-90" />
+        <span class="text-xs font-mono uppercase tracking-wider font-medium">
+          <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('deck.foldDeck')}</span>
+          <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('deck.foldDeck')}</span>
+          <span class="text-[10px] text-luxury-taupe/60 ml-1 font-mono">(Esc)</span>
+        </span>
+      </button>
     </div>
   </div>
-</a>
+
+  <!-- Cards Container: Closed state fanned stack <-> Active state dealt grid -->
+  <div class="deck-cards-wrapper relative w-full aspect-[4/5] sm:aspect-[3/4] max-w-[340px] sm:max-w-[380px] mx-auto flex items-center justify-center py-4">
+    {allImages.map((imgId, idx) => {
+      const isCard0 = idx === 0;
+      const isCard1 = idx === 1;
+      const isCard2 = idx === 2;
+      const isCardRest = idx >= 3;
+
+      return (
+        <div
+          class={`dealt-card ${isCard0 ? 'card-layer-bottom' : ''} ${isCard1 ? 'card-layer-middle' : ''} ${isCard2 ? 'card-layer-top' : ''} ${isCardRest ? 'card-layer-hidden' : ''}`}
+          data-card-index={idx}
+          style={`--card-idx: ${idx};`}
+        >
+          <img
+            src={getCloudinaryUrl(imgId, 'f_auto,q_auto')}
+            alt={`${titleEn} - Exposure ${idx + 1}`}
+            loading={idx < 4 ? 'eager' : 'lazy'}
+            decoding="async"
+            class="w-full h-full object-cover select-none pointer-events-none transition-transform duration-500 ease-out"
+          />
+
+          <!-- Closed-state ambient shadows/tints on background cards -->
+          {isCard0 && (
+            <div class="closed-stack-tint absolute inset-0 bg-luxury-base/30 group-hover:bg-transparent transition-colors duration-500"></div>
+          )}
+          {isCard1 && (
+            <div class="closed-stack-tint absolute inset-0 bg-luxury-base/20 group-hover:bg-transparent transition-colors duration-500"></div>
+          )}
+
+          <!-- Closed-state Cover Information Overlay (hidden when .active-deck) -->
+          {isCard2 && (
+            <div class="closed-cover-overlay absolute inset-0 bg-gradient-to-t from-luxury-base/95 via-luxury-base/30 to-transparent flex flex-col justify-between p-4 pointer-events-none">
+              <!-- Top Monogram Badge -->
+              <div class="flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-luxury-taupe">
+                <span class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-luxury-base/70 backdrop-blur-sm border border-luxury-taupe/30">
+                  <Film class="w-3 h-3 text-luxury-taupe" />
+                  <span>35mm</span>
+                </span>
+                <span class="w-6 h-6 rounded-full bg-luxury-base/70 backdrop-blur-sm border border-luxury-taupe/30 flex items-center justify-center text-luxury-cream group-hover:bg-luxury-crimson group-hover:text-luxury-cream group-hover:border-luxury-crimson transition-all duration-300">
+                  <ArrowUpRight class="w-3.5 h-3.5" />
+                </span>
+              </div>
+
+              <!-- Bottom Category Title & Meta -->
+              <div class="text-left">
+                <h2 class="font-serif text-xl sm:text-2xl text-luxury-cream font-normal tracking-tight drop-shadow-md">
+                  <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{titleEn}</span>
+                  <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{titleRu}</span>
+                </h2>
+                <div class="flex items-center justify-between mt-1 text-[10px] font-mono uppercase tracking-widest text-luxury-taupe border-t border-luxury-taupe/20 pt-1.5">
+                  <span class="text-luxury-cream/90 flex items-center gap-1 font-medium">
+                    <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('deck.expandDeck')}</span>
+                    <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('deck.expandDeck')}</span>
+                  </span>
+                  {displayTotal > 0 && (
+                    <span class="text-luxury-taupe/80">
+                      {displayTotal}{' '}
+                      <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('deck.exposures')}</span>
+                      <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('deck.exposures')}</span>
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <!-- Active Dealt Card Overlay: Exposure Tag (visible when dealt in grid) -->
+          <div class="active-card-meta opacity-0 pointer-events-none absolute inset-0 bg-gradient-to-t from-luxury-base/80 via-transparent to-transparent flex items-end justify-between p-3 transition-opacity duration-300">
+            <span class="text-[10px] font-mono uppercase tracking-widest text-luxury-cream font-semibold">
+              EXP {String(idx + 1).padStart(2, '0')}
+            </span>
+            <span class="text-[9px] font-mono uppercase tracking-widest text-luxury-taupe px-1.5 py-0.5 rounded bg-luxury-base/80 border border-luxury-taupe/30">
+              {titleEn}
+            </span>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+</div>
+
+<style is:global>
+  /* Closed State: Fanned Card Stack */
+  .category-deck-card:not(.active-deck) .card-layer-bottom {
+    position: absolute;
+    inset-inline: 1.5rem;
+    inset-block: 1rem;
+    border-radius: 0.375rem;
+    overflow: hidden;
+    border: 1px solid rgba(140, 117, 98, 0.3);
+    background-color: #0B0C0E;
+    transform: rotate(-3deg) translateX(-0.25rem);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0.75;
+    z-index: 1;
+    pointer-events: none;
+  }
+  @media (min-width: 640px) {
+    .category-deck-card:not(.active-deck) .card-layer-bottom {
+      inset-inline: 2rem;
+      inset-block: 1.5rem;
+    }
+  }
+  .category-deck-card:not(.active-deck):hover .card-layer-bottom {
+    transform: rotate(-6deg) translateX(-1.25rem) scale(0.98);
+    opacity: 1;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8);
+  }
+
+  .category-deck-card:not(.active-deck) .card-layer-middle {
+    position: absolute;
+    inset-inline: 1.5rem;
+    inset-block: 1rem;
+    border-radius: 0.375rem;
+    overflow: hidden;
+    border: 1px solid rgba(140, 117, 98, 0.3);
+    background-color: #0B0C0E;
+    transform: rotate(2deg) translateX(0.25rem);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0.85;
+    z-index: 2;
+    pointer-events: none;
+  }
+  @media (min-width: 640px) {
+    .category-deck-card:not(.active-deck) .card-layer-middle {
+      inset-inline: 2rem;
+      inset-block: 1.5rem;
+    }
+  }
+  .category-deck-card:not(.active-deck):hover .card-layer-middle {
+    transform: rotate(6deg) translateX(1.25rem) scale(0.98);
+    opacity: 1;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8);
+  }
+
+  .category-deck-card:not(.active-deck) .card-layer-top {
+    position: relative;
+    width: calc(100% - 3rem);
+    aspect-ratio: 4 / 5;
+    border-radius: 0.375rem;
+    overflow: hidden;
+    border: 1px solid rgba(140, 117, 98, 0.4);
+    background-color: #0B0C0E;
+    box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.7);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 3;
+  }
+  @media (min-width: 640px) {
+    .category-deck-card:not(.active-deck) .card-layer-top {
+      width: calc(100% - 4rem);
+      aspect-ratio: 3 / 4;
+    }
+  }
+  .category-deck-card:not(.active-deck):hover .card-layer-top {
+    transform: translateY(-0.5rem);
+    border-color: rgba(140, 117, 98, 0.8);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.95);
+  }
+
+  .category-deck-card:not(.active-deck) .card-layer-hidden {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Inactive State: When another deck is active */
+  .category-deck-card.inactive {
+    opacity: 0.25 !important;
+    filter: grayscale(1) !important;
+    pointer-events: none !important;
+    transition: opacity 0.5s ease, filter 0.5s ease !important;
+  }
+
+  /* Active Tabletop Takeover State */
+  .category-deck-card.active-deck {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 50 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100dvh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 0 1rem 4rem 1rem !important;
+    cursor: default !important;
+    background: transparent !important;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  @media (min-width: 1024px) {
+    .category-deck-card.active-deck {
+      padding: 0 3rem 5rem 3rem !important;
+    }
+  }
+
+  .category-deck-card.active-deck .deck-expanded-header {
+    display: flex !important;
+    animation: fadeInExpandedHeader 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .category-deck-card.active-deck .deck-cards-wrapper {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.75rem !important;
+    max-width: 72rem !important;
+    width: 100% !important;
+    aspect-ratio: auto !important;
+    position: relative !important;
+    padding: 0 0.25rem 4rem 0.25rem !important;
+    margin: 0 auto !important;
+  }
+  @media (min-width: 640px) {
+    .category-deck-card.active-deck .deck-cards-wrapper {
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      gap: 1.25rem !important;
+    }
+  }
+  @media (min-width: 1024px) {
+    .category-deck-card.active-deck .deck-cards-wrapper {
+      grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+      gap: 1.5rem !important;
+    }
+  }
+
+  /* Dealt Cards Animation in Active Grid */
+  .category-deck-card.active-deck .dealt-card {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    aspect-ratio: 4 / 5 !important;
+    border-radius: 0.375rem !important;
+    overflow: hidden !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: none !important;
+    border: 1px solid rgba(140, 117, 98, 0.3) !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7), 0 8px 10px -6px rgba(0, 0, 0, 0.7) !important;
+    animation: dealCard 0.5s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+  }
+
+  /* Sequential Dealing Delay */
+  .category-deck-card.active-deck .dealt-card:nth-child(1) { animation-delay: 0.04s !important; }
+  .category-deck-card.active-deck .dealt-card:nth-child(2) { animation-delay: 0.08s !important; }
+  .category-deck-card.active-deck .dealt-card:nth-child(3) { animation-delay: 0.12s !important; }
+  .category-deck-card.active-deck .dealt-card:nth-child(4) { animation-delay: 0.16s !important; }
+  .category-deck-card.active-deck .dealt-card:nth-child(5) { animation-delay: 0.20s !important; }
+  .category-deck-card.active-deck .dealt-card:nth-child(6) { animation-delay: 0.24s !important; }
+  .category-deck-card.active-deck .dealt-card:nth-child(7) { animation-delay: 0.28s !important; }
+  .category-deck-card.active-deck .dealt-card:nth-child(8) { animation-delay: 0.32s !important; }
+  .category-deck-card.active-deck .dealt-card:nth-child(9) { animation-delay: 0.36s !important; }
+  .category-deck-card.active-deck .dealt-card:nth-child(10) { animation-delay: 0.40s !important; }
+  .category-deck-card.active-deck .dealt-card:nth-child(11) { animation-delay: 0.44s !important; }
+  .category-deck-card.active-deck .dealt-card:nth-child(12) { animation-delay: 0.48s !important; }
+
+  /* Hide Closed-state Elements when Active */
+  .category-deck-card.active-deck .closed-stack-tint,
+  .category-deck-card.active-deck .closed-cover-overlay {
+    display: none !important;
+  }
+
+  /* Show Card Meta on Hover in Active Grid */
+  .category-deck-card.active-deck .dealt-card:hover .active-card-meta {
+    opacity: 1 !important;
+  }
+  .category-deck-card.active-deck .dealt-card:hover img {
+    transform: scale(1.04) !important;
+  }
+
+  @keyframes dealCard {
+    0% {
+      opacity: 0;
+      transform: translateY(35px) scale(0.9) rotate(-3deg);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1) rotate(0deg);
+    }
+  }
+
+  @keyframes fadeInExpandedHeader {
+    0% {
+      opacity: 0;
+      transform: translateY(-12px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
