@@ -80,7 +80,8 @@ const filmstripFrames = posts.flatMap((post, postIdx) => {
 
   <!-- Main Horizontal Scroll Container -->
   <div
-    class="desktop-horizontal-gallery flex flex-row overflow-x-auto gap-6 sm:gap-8 px-8 py-8 items-stretch no-scrollbar scroll-smooth focus:outline-none cursor-grab select-none"
+    class="desktop-horizontal-gallery flex flex-row overflow-x-auto gap-6 sm:gap-8 px-8 py-8 items-stretch no-scrollbar scroll-smooth focus:outline-none cursor-grab select-none overscroll-x-contain"
+    style="overscroll-behavior-x: contain;"
     tabindex="0"
     role="region"
     aria-label="Horizontal Photography Filmstrip"
@@ -93,7 +94,7 @@ const filmstripFrames = posts.flatMap((post, postIdx) => {
         <!-- Top Frame Metadata Header -->
         <div class="flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-luxury-taupe pb-2.5 border-b border-luxury-taupe/20 mb-3">
           <div class="flex items-center gap-2">
-            <span class="text-luxury-cream font-semibold">EXP {String(idx + 1).padStart(2, '0')}</span>
+            <span class="text-luxury-cream font-semibold">{currentLang === 'ru' ? tRu('filmstrip.exp') : tEn('filmstrip.exp')} {String(idx + 1).padStart(2, '0')}</span>
             <span class="text-luxury-taupe/40">·</span>
             <span class="text-luxury-taupe">{frame.camera}</span>
           </div>
@@ -197,6 +198,9 @@ const filmstripFrames = posts.flatMap((post, postIdx) => {
       let isDown = false;
       let startX = 0;
       let lastX = 0;
+      let lastTime = 0;
+      let velocity = 0;
+      let rafId: number | null = null;
       let hasDragged = false;
       let intervalId: number | null = null;
       let idleTimer: number | null = null;
@@ -204,22 +208,58 @@ const filmstripFrames = posts.flatMap((post, postIdx) => {
       let isTouchInteracting = false;
       let touchResetTimeout: number | null = null;
 
-      // 1. Auto-Advance Ticker (5-second interval, smooth card scrolling with wrap)
+      // Stop any pending inertia loop
+      const cancelInertia = () => {
+        if (rafId !== null) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+      };
+
+      // 1. Smart Auto-Centering Ticker (5-second interval, geometric alignment)
+      const executeSmartAutoCentering = () => {
+        // Halt if user is interacting: hovering, dragging, touch, or active momentum inertia
+        if (isDown || isHovered || isTouchInteracting || rafId !== null || Math.abs(velocity) > 0.05) {
+          return;
+        }
+
+        const cards = Array.from(gallery.querySelectorAll<HTMLElement>('[data-film-frame]'));
+        if (cards.length === 0) return;
+
+        // Container horizontal center point in scroll coordinate space
+        const containerCenter = gallery.scrollLeft + gallery.clientWidth / 2;
+
+        // Last card center evaluation
+        const lastCard = cards[cards.length - 1];
+        const lastCardCenter = lastCard.offsetLeft + lastCard.offsetWidth / 2;
+        const maxScrollLeft = gallery.scrollWidth - gallery.clientWidth;
+
+        // Rewind to beginning if last image is currently centered or at right edge
+        if (Math.abs(containerCenter - lastCardCenter) < 16 || gallery.scrollLeft >= maxScrollLeft - 8) {
+          gallery.scrollTo({ left: 0, behavior: 'smooth' });
+          return;
+        }
+
+        // Geometric search: find first image whose center is geographically to the right of container center
+        const targetCard = cards.find((card) => {
+          const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+          return cardCenter > containerCenter + 8; // epsilon to avoid oscillating on current card
+        });
+
+        if (targetCard) {
+          // Calculate scrollLeft offset required to perfectly align target card center with container center
+          const targetCenter = targetCard.offsetLeft + targetCard.offsetWidth / 2;
+          const calculatedOffset = Math.max(0, targetCenter - gallery.clientWidth / 2);
+          gallery.scrollTo({ left: Math.round(calculatedOffset), behavior: 'smooth' });
+        } else {
+          // Fallback rewind to beginning if no further cards to the right
+          gallery.scrollTo({ left: 0, behavior: 'smooth' });
+        }
+      };
+
       const startAutoAdvance = () => {
         if (intervalId !== null) return;
-        intervalId = window.setInterval(() => {
-          if (isDown || isHovered || isTouchInteracting) return;
-          const firstCard = gallery.querySelector<HTMLElement>('[data-film-frame]');
-          const cardWidth = firstCard ? firstCard.offsetWidth + 32 : 450;
-          const maxScrollLeft = gallery.scrollWidth - gallery.clientWidth;
-
-          // Wrap smoothly back to index 0 when at or nearing the end
-          if (gallery.scrollLeft >= maxScrollLeft - 16) {
-            gallery.scrollTo({ left: 0, behavior: 'smooth' });
-          } else {
-            gallery.scrollBy({ left: cardWidth, behavior: 'smooth' });
-          }
-        }, 5000);
+        intervalId = window.setInterval(executeSmartAutoCentering, 5000);
       };
 
       const stopAutoAdvance = () => {
@@ -235,27 +275,54 @@ const filmstripFrames = posts.flatMap((post, postIdx) => {
           idleTimer = null;
         }
         idleTimer = window.setTimeout(() => {
-          if (!isDown && !isHovered && !isTouchInteracting) {
+          if (!isDown && !isHovered && !isTouchInteracting && rafId === null && Math.abs(velocity) <= 0.05) {
             startAutoAdvance();
           }
         }, delay);
       };
 
-      // 2. Mouse Click-and-Drag Controller (cursor grab/grabbing & smooth 1:1 displacement)
+      // 2. Momentum Inertia Physics Loop
+      const startInertia = () => {
+        cancelInertia();
+        gallery.style.scrollBehavior = 'auto';
+
+        const step = () => {
+          velocity *= 0.95; // 0.95 friction multiplier per frame
+          gallery.scrollLeft -= velocity;
+
+          if (Math.abs(velocity) > 0.1) {
+            rafId = requestAnimationFrame(step);
+          } else {
+            // Absolute zero reached: cleanly reset physics state and resume smooth scroll
+            velocity = 0;
+            rafId = null;
+            gallery.style.scrollBehavior = 'smooth';
+            if (!isHovered && !isDown && !isTouchInteracting) {
+              restartIdleTimer(3000);
+            }
+          }
+        };
+
+        rafId = requestAnimationFrame(step);
+      };
+
+      // 3. Mouse Click-and-Drag Controller
       const onMouseDown = (e: MouseEvent) => {
-        // Only accept primary mouse click and ignore touch-synthesized mouse events
         if (isTouchInteracting || e.button !== 0) return;
 
+        cancelInertia();
+        velocity = 0;
         isDown = true;
         hasDragged = false;
         startX = e.pageX;
         lastX = e.pageX;
+        lastTime = performance.now();
 
         // Visual grab state toggle
         gallery.classList.remove('cursor-grab');
         gallery.classList.add('cursor-grabbing');
         gallery.style.cursor = 'grabbing';
-        gallery.style.scrollBehavior = 'auto'; // Instantaneous 1:1 displacement during drag
+        gallery.style.scrollBehavior = 'auto';
 
         stopAutoAdvance();
         if (idleTimer !== null) {
@@ -268,33 +335,48 @@ const filmstripFrames = posts.flatMap((post, postIdx) => {
         if (!isDown) return;
         e.preventDefault();
 
+        const now = performance.now();
+        const dt = Math.max(1, now - lastTime);
         const delta = Math.abs(e.pageX - startX);
         if (delta > 4) {
           hasDragged = true;
         }
 
-        // Direct 1:1 displacement via movementX with delta fallback
-        if (typeof e.movementX === 'number' && e.movementX !== 0) {
-          gallery.scrollLeft -= e.movementX;
-        } else {
-          const moveDelta = e.pageX - lastX;
-          gallery.scrollLeft -= moveDelta;
-        }
+        const moveDelta = e.pageX - lastX;
+        gallery.scrollLeft -= moveDelta;
+
+        // Velocity tracking normalized to 60fps frame (~16.67ms)
+        const instantVelocity = (moveDelta / dt) * 16.67;
+        velocity = velocity * 0.3 + instantVelocity * 0.7;
+
         lastX = e.pageX;
+        lastTime = now;
       };
 
       const onMouseUp = () => {
         if (!isDown) return;
         isDown = false;
 
-        // Restore grab state and smooth scrolling
+        // Restore grab state
         gallery.classList.remove('cursor-grabbing');
         gallery.classList.add('cursor-grab');
         gallery.style.cursor = 'grab';
-        gallery.style.scrollBehavior = 'smooth';
 
-        if (!isHovered) {
-          restartIdleTimer(3000);
+        // Discard velocity if user held mouse still prior to release
+        const timeSinceLastMove = performance.now() - lastTime;
+        if (timeSinceLastMove > 80) {
+          velocity = 0;
+        }
+
+        // Trigger inertia loop or restore smooth scroll
+        if (Math.abs(velocity) > 0.5) {
+          startInertia();
+        } else {
+          velocity = 0;
+          gallery.style.scrollBehavior = 'smooth';
+          if (!isHovered) {
+            restartIdleTimer(3000);
+          }
         }
       };
 
@@ -302,8 +384,9 @@ const filmstripFrames = posts.flatMap((post, postIdx) => {
         isHovered = false;
         if (isDown) {
           onMouseUp();
+        } else if (rafId === null && Math.abs(velocity) <= 0.05) {
+          restartIdleTimer(2000);
         }
-        restartIdleTimer(2000);
       };
 
       const onMouseEnter = () => {
@@ -323,6 +406,8 @@ const filmstripFrames = posts.flatMap((post, postIdx) => {
       // Native touch events passthrough: pause ticker on touch, resume on release
       const onTouchStart = () => {
         isTouchInteracting = true;
+        cancelInertia();
+        velocity = 0;
         if (touchResetTimeout !== null) {
           clearTimeout(touchResetTimeout);
           touchResetTimeout = null;
@@ -341,8 +426,10 @@ const filmstripFrames = posts.flatMap((post, postIdx) => {
         restartIdleTimer(4000);
       };
 
-      // 3. Mouse-wheel translation (converts vertical wheel delta to horizontal scroll)
+      // 4. Mouse-wheel translation (converts vertical wheel delta to horizontal scroll)
       const onWheel = (evt: WheelEvent) => {
+        cancelInertia();
+        velocity = 0;
         stopAutoAdvance();
         restartIdleTimer(3500);
 
@@ -388,6 +475,7 @@ const filmstripFrames = posts.flatMap((post, postIdx) => {
       const instance: GalleryInstance = {
         destroy: () => {
           stopAutoAdvance();
+          cancelInertia();
           if (idleTimer !== null) {
             clearTimeout(idleTimer);
             idleTimer = null;
