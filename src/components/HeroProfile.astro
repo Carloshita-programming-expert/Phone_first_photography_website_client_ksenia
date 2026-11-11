@@ -49,7 +49,7 @@ const portrait = profile?.portrait || profile?.profile_image || defaultProfile.p
 ---
 
 <section
-  class="hero-profile min-h-screen w-full flex flex-col justify-between items-center text-center px-4 py-8 sm:py-12 lg:py-16 relative"
+  class="hero-profile min-h-screen w-full flex flex-col justify-between items-center text-center px-4 py-8 sm:py-12 lg:py-16 relative lg:snap-start lg:snap-always"
   aria-label="Photographer Profile"
 >
   <!-- Spacer for top balance -->
@@ -140,9 +140,33 @@ const portrait = profile?.portrait || profile?.profile_image || defaultProfile.p
       aria-label="Scroll down to photography"
     >
       <span class="text-[10px] font-mono uppercase tracking-[0.3em] text-luxury-taupe group-hover:text-luxury-cream transition-colors">
-        Curated Photography
+        CURATED PHOTOGRAPHY
       </span>
       <ChevronDown class="w-4 h-4 text-luxury-taupe group-hover:text-luxury-crimson transition-transform duration-300 group-hover:translate-y-1 animate-bounce" />
     </a>
   </div>
 </section>
+
+<script>
+  function setupHeroScroll() {
+    const scrollButtons = document.querySelectorAll<HTMLAnchorElement>('a[href="#photography-section"]');
+    const feedElement = document.getElementById('photography-section');
+    if (!feedElement) return;
+
+    scrollButtons.forEach((btn) => {
+      if (btn.dataset.heroScrollInitialized === 'true') return;
+      btn.dataset.heroScrollInitialized = 'true';
+
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.scrollTo({
+          top: feedElement.offsetTop,
+          behavior: 'smooth',
+        });
+      });
+    });
+  }
+
+  setupHeroScroll();
+  document.addEventListener('astro:page-load', setupHeroScroll);
+</script>

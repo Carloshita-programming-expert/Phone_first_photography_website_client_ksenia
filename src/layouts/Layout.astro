@@ -9,6 +9,7 @@ interface Props {
   description?: string;
   currentLang?: 'en' | 'ru';
   activeTab?: 'home' | 'grid' | 'about';
+  snapDesktop?: boolean;
 }
 
 const {
@@ -16,11 +17,12 @@ const {
   description = 'High-end photography portfolio featuring curated analog shoots.',
   currentLang = 'en',
   activeTab,
+  snapDesktop = false,
 } = Astro.props;
 ---
 
 <!doctype html>
-<html lang={currentLang} class="bg-luxury-base text-luxury-cream antialiased">
+<html lang={currentLang} class={`bg-luxury-base text-luxury-cream antialiased ${snapDesktop ? 'lg:snap-y lg:snap-mandatory snap-desktop-hero' : ''}`}>
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content={description} />

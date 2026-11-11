@@ -23,12 +23,13 @@ try {
   description="Curated high-end photography portfolio featuring stories from Kyoto, Iceland, Berlin, Almaty, and Milos."
   currentLang={currentLang}
   activeTab="home"
+  snapDesktop={true}
 >
   <!-- Landing View: Profile-First Experience (min-h-screen initial viewport) -->
   <HeroProfile currentLang={currentLang} />
 
   <!-- Photography Works Section below the Hero Profile -->
-  <div id="photography-section" class="w-full pt-8 sm:pt-12 border-t border-luxury-taupe/20">
+  <div id="photography-section" class="w-full pt-8 sm:pt-12 border-t border-luxury-taupe/20 lg:snap-start">
     <!-- Mobile Viewport: Instagram-style vertical scroll-snap feed (block lg:hidden) -->
     <section class="block lg:hidden w-full flex flex-col" aria-label="Mobile Photography Feed">
       {posts.map((post, index) => (
