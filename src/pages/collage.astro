@@ -20,6 +20,14 @@ try {
 } catch (_err) {
   // Graceful fallback during build
 }
+
+const filterCategories = [
+  { key: 'all', labelEn: tEn('category.all'), labelRu: tRu('category.all') },
+  { key: 'Portraiture', labelEn: tEn('category.portraiture'), labelRu: tRu('category.portraiture') },
+  { key: 'Editorial', labelEn: tEn('category.editorial'), labelRu: tRu('category.editorial') },
+  { key: 'Love Story', labelEn: tEn('category.loveStory'), labelRu: tRu('category.loveStory') },
+  { key: 'Documentary', labelEn: tEn('category.documentary'), labelRu: tRu('category.documentary') },
+];
 ---
 
 <Layout
@@ -42,9 +50,81 @@ try {
         <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('collage.desc')}</span>
         <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('collage.desc')}</span>
       </p>
+
+      <!-- Category Filter Pills Bar -->
+      <div class="flex items-center justify-center flex-wrap gap-2 mt-5" role="group" aria-label="Category Filter">
+        {filterCategories.map((cat) => (
+          <button
+            type="button"
+            data-filter-category={cat.key}
+            class="category-filter-btn px-3.5 py-1 rounded-full text-xs font-mono uppercase tracking-wider border border-luxury-taupe/30 text-luxury-taupe hover:text-luxury-cream hover:border-luxury-taupe transition-all duration-200 cursor-pointer"
+          >
+            <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{cat.labelEn}</span>
+            <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{cat.labelRu}</span>
+          </button>
+        ))}
+      </div>
     </header>
 
     <MasonryGrid posts={posts} />
     <Lightbox currentLang={currentLang} />
   </div>
+
+  <script>
+    function setupCollageCategoryFilter() {
+      const url = new URL(window.location.href);
+      const initialCategory = url.searchParams.get('category');
+      const buttons = document.querySelectorAll<HTMLButtonElement>('[data-filter-category]');
+      const cards = document.querySelectorAll<HTMLElement>('[data-masonry-card]');
+
+      function filterToCategory(cat: string | null) {
+        const activeKey = cat && cat.toLowerCase() !== 'all' ? cat.toLowerCase() : 'all';
+
+        // Update button active styling
+        buttons.forEach((btn) => {
+          const btnCat = (btn.getAttribute('data-filter-category') || '').toLowerCase();
+          const isActive = btnCat === activeKey;
+          if (isActive) {
+            btn.classList.add('bg-luxury-crimson', 'text-luxury-cream', 'border-luxury-crimson', 'font-semibold', 'shadow-sm');
+            btn.classList.remove('text-luxury-taupe', 'hover:text-luxury-cream', 'border-luxury-taupe/30');
+          } else {
+            btn.classList.remove('bg-luxury-crimson', 'text-luxury-cream', 'border-luxury-crimson', 'font-semibold', 'shadow-sm');
+            btn.classList.add('text-luxury-taupe', 'hover:text-luxury-cream', 'border-luxury-taupe/30');
+          }
+        });
+
+        // Filter masonry cards
+        cards.forEach((card) => {
+          const cardCat = (card.getAttribute('data-category') || '').toLowerCase();
+          if (activeKey === 'all' || cardCat === activeKey) {
+            card.classList.remove('hidden');
+          } else {
+            card.classList.add('hidden');
+          }
+        });
+
+        // Update URL query parameter
+        const nextUrl = new URL(window.location.href);
+        if (activeKey === 'all') {
+          nextUrl.searchParams.delete('category');
+        } else {
+          nextUrl.searchParams.set('category', cat!);
+        }
+        window.history.replaceState({}, '', nextUrl.toString());
+      }
+
+      buttons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const cat = btn.getAttribute('data-filter-category');
+          filterToCategory(cat);
+        });
+      });
+
+      // Run filter on initial page load based on ?category= parameter
+      filterToCategory(initialCategory);
+    }
+
+    setupCollageCategoryFilter();
+    document.addEventListener('astro:page-load', setupCollageCategoryFilter);
+  </script>
 </Layout>

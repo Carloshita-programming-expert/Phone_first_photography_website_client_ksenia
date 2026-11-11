@@ -3,7 +3,7 @@ import { useTranslations } from '../i18n/ui';
 
 interface Props {
   currentLang?: 'en' | 'ru';
-  activeTab?: 'home' | 'grid' | 'about';
+  activeTab?: 'home' | 'portfolio' | 'grid' | 'about';
 }
 
 const { currentLang = 'en', activeTab } = Astro.props;
@@ -12,13 +12,15 @@ const tEn = useTranslations('en');
 const tRu = useTranslations('ru');
 
 const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
-const resolvedActiveTab: 'home' | 'grid' | 'about' =
+const resolvedActiveTab: 'home' | 'portfolio' | 'grid' | 'about' =
   activeTab ||
-  (pathname.startsWith('/collage')
-    ? 'grid'
-    : pathname.startsWith('/profile')
-      ? 'about'
-      : 'home');
+  (pathname.startsWith('/portfolio')
+    ? 'portfolio'
+    : pathname.startsWith('/collage')
+      ? 'grid'
+      : pathname.startsWith('/profile')
+        ? 'about'
+        : 'home');
 ---
 
 <header
@@ -52,6 +54,22 @@ const resolvedActiveTab: 'home' | 'grid' | 'about' =
       <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('nav.feed')}</span>
       <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('nav.feed')}</span>
       {resolvedActiveTab === 'home' && (
+        <span class="absolute -bottom-1 left-0 w-full h-[2px] bg-luxury-crimson rounded-full"></span>
+      )}
+    </a>
+
+    <a
+      href="/portfolio"
+      class={`transition-colors py-1 relative ${
+        resolvedActiveTab === 'portfolio'
+          ? 'text-luxury-cream font-semibold'
+          : 'text-luxury-taupe hover:text-luxury-cream'
+      }`}
+      aria-current={resolvedActiveTab === 'portfolio' ? 'page' : undefined}
+    >
+      <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('nav.portfolio')}</span>
+      <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('nav.portfolio')}</span>
+      {resolvedActiveTab === 'portfolio' && (
         <span class="absolute -bottom-1 left-0 w-full h-[2px] bg-luxury-crimson rounded-full"></span>
       )}
     </a>

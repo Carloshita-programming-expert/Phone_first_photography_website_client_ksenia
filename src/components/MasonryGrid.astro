@@ -6,6 +6,7 @@ export interface PostItem {
   id?: string;
   title?: string;
   title_ru?: string;
+  category?: string;
   location?: string;
   camera?: string;
   date?: string;
@@ -29,6 +30,7 @@ const allPhotos = posts.flatMap((post) => {
     imgId,
     title: post.title || 'Untitled Series',
     title_ru: post.title_ru || post.title || 'Безымянная серия',
+    category: post.category || 'Editorial',
     location: post.location || 'Unknown Location',
     camera: post.camera || '35mm Film',
     date: post.date || '',
@@ -40,10 +42,12 @@ const allPhotos = posts.flatMap((post) => {
 ---
 
 <div class="w-full">
-  <div class="columns-2 sm:columns-3 lg:columns-4 gap-3 sm:gap-4 space-y-3 sm:space-y-4">
+  <div class="columns-2 sm:columns-3 lg:columns-4 gap-3 sm:gap-4 space-y-3 sm:space-y-4" id="masonry-grid-container">
     {allPhotos.map((photo, i) => (
       <figure
         class="break-inside-avoid relative group rounded-sm overflow-hidden bg-luxury-base border border-luxury-taupe/20 shadow-sm transition-all duration-300 hover:border-luxury-taupe/60 hover:shadow-xl cursor-pointer"
+        data-masonry-card
+        data-category={photo.category}
         data-lightbox-trigger
         data-lightbox-src={getCloudinaryUrl(photo.imgId, 'f_auto,q_auto')}
         data-lightbox-alt={`${photo.title} · ${photo.location}`}

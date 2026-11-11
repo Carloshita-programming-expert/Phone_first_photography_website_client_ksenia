@@ -19,8 +19,24 @@ export const ui = {
 
     // Navigation Tabs
     'nav.feed': 'Feed',
+    'nav.portfolio': 'Portfolio',
     'nav.collage': 'Collage',
     'nav.profile': 'Profile',
+
+    // Portfolio Page & Category Decks
+    'portfolio.title': 'Portfolio | Curated Decks',
+    'portfolio.description': 'Curated decks of analog photography categorized by visual genre.',
+    'portfolio.tag': 'Curated Portfolios',
+    'portfolio.heading': 'The Series Decks',
+    'portfolio.desc': 'Physical card decks grouped by photographic genre. Hover or tap to expand each stack.',
+    'category.all': 'All Exposures',
+    'category.portraiture': 'Portraiture',
+    'category.editorial': 'Editorial',
+    'category.loveStory': 'Love Story',
+    'category.documentary': 'Documentary',
+    'deck.viewSeries': 'View Category',
+    'deck.exposures': 'Exposures',
+    'deck.exploreStack': 'Hover / Tap to Fan Stack',
 
     // Layout Defaults
     'layout.title': 'Visual Stories | Photography Portfolio',
@@ -85,8 +101,24 @@ export const ui = {
 
     // Navigation Tabs
     'nav.feed': 'Лента',
+    'nav.portfolio': 'Портфолио',
     'nav.collage': 'Коллаж',
     'nav.profile': 'Профиль',
+
+    // Portfolio Page & Category Decks
+    'portfolio.title': 'Портфолио | Серии работ',
+    'portfolio.description': 'Коллекции пленочных фотографий, разделенные по визуальным жанрам.',
+    'portfolio.tag': 'Тематические архивы',
+    'portfolio.heading': 'Колоды серий',
+    'portfolio.desc': 'Авторские колоды по жанрам фотографии. Наведите курсор или нажмите, чтобы раскрыть стопку.',
+    'category.all': 'Все кадры',
+    'category.portraiture': 'Портреты',
+    'category.editorial': 'Эдиториал',
+    'category.loveStory': 'Истории любви',
+    'category.documentary': 'Документалистика',
+    'deck.viewSeries': 'Смотреть категорию',
+    'deck.exposures': 'Кадров',
+    'deck.exploreStack': 'Нажмите для раскрытия',
 
     // Layout Defaults
     'layout.title': 'Визуальные истории | Портфолио фотографии',

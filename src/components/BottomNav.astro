@@ -1,10 +1,10 @@
 ---
-import { Home, Grid, User } from 'lucide-astro';
+import { Home, Layers, Grid, User } from 'lucide-astro';
 import { useTranslations } from '../i18n/ui';
 
 interface Props {
   currentLang?: 'en' | 'ru';
-  activeTab?: 'home' | 'grid' | 'about';
+  activeTab?: 'home' | 'portfolio' | 'grid' | 'about';
 }
 
 const { currentLang = 'en', activeTab } = Astro.props;
@@ -13,13 +13,15 @@ const tEn = useTranslations('en');
 const tRu = useTranslations('ru');
 
 const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
-const resolvedActiveTab: 'home' | 'grid' | 'about' =
+const resolvedActiveTab: 'home' | 'portfolio' | 'grid' | 'about' =
   activeTab ||
-  (pathname.startsWith('/collage')
-    ? 'grid'
-    : pathname.startsWith('/profile')
-      ? 'about'
-      : 'home');
+  (pathname.startsWith('/portfolio')
+    ? 'portfolio'
+    : pathname.startsWith('/collage')
+      ? 'grid'
+      : pathname.startsWith('/profile')
+        ? 'about'
+        : 'home');
 ---
 
 <nav
@@ -45,6 +47,28 @@ const resolvedActiveTab: 'home' | 'grid' | 'about' =
         <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('nav.feed')}</span>
       </span>
       {resolvedActiveTab === 'home' && (
+        <span class="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-luxury-crimson shadow-[0_0_8px_rgba(113,28,29,0.9)]"></span>
+      )}
+    </a>
+
+    <!-- Portfolio Decks Tab -->
+    <a
+      href="/portfolio"
+      id="nav-portfolio"
+      class={`relative flex flex-col items-center gap-1 py-1 transition-colors ${
+        resolvedActiveTab === 'portfolio'
+          ? 'text-luxury-cream font-medium'
+          : 'text-luxury-taupe hover:text-luxury-cream'
+      }`}
+      aria-label="Portfolio Decks"
+      aria-current={resolvedActiveTab === 'portfolio' ? 'page' : undefined}
+    >
+      <Layers class={`w-5 h-5 stroke-[1.8] ${resolvedActiveTab === 'portfolio' ? 'text-luxury-cream' : 'text-luxury-taupe'}`} />
+      <span class="text-[10px] tracking-tight">
+        <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('nav.portfolio')}</span>
+        <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('nav.portfolio')}</span>
+      </span>
+      {resolvedActiveTab === 'portfolio' && (
         <span class="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-luxury-crimson shadow-[0_0_8px_rgba(113,28,29,0.9)]"></span>
       )}
     </a>

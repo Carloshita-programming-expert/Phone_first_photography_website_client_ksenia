@@ -1,0 +1,119 @@
+---
+import { getCloudinaryUrl } from '../utils/cloudinary';
+import { Film, ArrowUpRight } from 'lucide-astro';
+import { useTranslations } from '../i18n/ui';
+
+interface Props {
+  category: 'Portraiture' | 'Editorial' | 'Love Story' | 'Documentary';
+  titleEn: string;
+  titleRu: string;
+  images: string[];
+  totalExposures?: number;
+  currentLang?: 'en' | 'ru';
+}
+
+const {
+  category,
+  titleEn,
+  titleRu,
+  images = [],
+  totalExposures = 0,
+  currentLang = 'en',
+} = Astro.props;
+
+const tEn = useTranslations('en');
+const tRu = useTranslations('ru');
+
+// Ensure at least 3 images for the physical card stack
+const stack = [
+  images[0] || 'samples/landscapes/nature-mountains',
+  images[1] || images[0] || 'samples/landscapes/beach-boat',
+  images[2] || images[1] || images[0] || 'samples/people/smiling-man',
+];
+---
+
+<a
+  href={`/collage?category=${encodeURIComponent(category)}`}
+  class="category-deck-card group block relative w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-luxury-crimson rounded-lg"
+  aria-label={`View ${titleEn} Category Portfolio`}
+>
+  <!-- Card Stack Container with safe padding to prevent mobile overflow -->
+  <div class="relative w-full aspect-[4/5] sm:aspect-[3/4] max-w-[340px] sm:max-w-[380px] mx-auto flex items-center justify-center py-4">
+    
+    <!-- Bottom Layer Photo (Fans out to the left on hover) -->
+    <div
+      class="absolute inset-x-6 inset-y-4 sm:inset-x-8 sm:inset-y-6 rounded-md overflow-hidden border border-luxury-taupe/30 bg-luxury-base shadow-md transition-all duration-500 ease-out -rotate-3 -translate-x-1 group-hover:-translate-x-5 sm:group-hover:-translate-x-7 group-hover:-rotate-6 group-hover:scale-[0.98] group-hover:shadow-2xl opacity-75 group-hover:opacity-100 select-none pointer-events-none"
+    >
+      <img
+        src={getCloudinaryUrl(stack[0], 'f_auto,q_auto')}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        class="w-full h-full object-cover select-none pointer-events-none"
+      />
+      <div class="absolute inset-0 bg-luxury-base/30 group-hover:bg-transparent transition-colors duration-500"></div>
+    </div>
+
+    <!-- Middle Layer Photo (Fans out to the right on hover) -->
+    <div
+      class="absolute inset-x-6 inset-y-4 sm:inset-x-8 sm:inset-y-6 rounded-md overflow-hidden border border-luxury-taupe/30 bg-luxury-base shadow-md transition-all duration-500 ease-out rotate-2 translate-x-1 group-hover:translate-x-5 sm:group-hover:translate-x-7 group-hover:rotate-6 group-hover:scale-[0.98] group-hover:shadow-2xl opacity-85 group-hover:opacity-100 select-none pointer-events-none"
+    >
+      <img
+        src={getCloudinaryUrl(stack[1], 'f_auto,q_auto')}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        class="w-full h-full object-cover select-none pointer-events-none"
+      />
+      <div class="absolute inset-0 bg-luxury-base/20 group-hover:bg-transparent transition-colors duration-500"></div>
+    </div>
+
+    <!-- Top Front Layer Photo (Lifts slightly upwards on hover) -->
+    <div
+      class="relative w-[calc(100%-3rem)] sm:w-[calc(100%-4rem)] aspect-[4/5] sm:aspect-[3/4] rounded-md overflow-hidden border border-luxury-taupe/40 bg-luxury-base shadow-xl transition-all duration-500 ease-out rotate-0 group-hover:-translate-y-2 group-hover:border-luxury-taupe/80 group-hover:shadow-[0_20px_45px_rgba(0,0,0,0.9)] z-10 select-none"
+    >
+      <img
+        src={getCloudinaryUrl(stack[2], 'f_auto,q_auto')}
+        alt={`${titleEn} category cover`}
+        loading="eager"
+        decoding="async"
+        class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03] select-none pointer-events-none"
+      />
+
+      <!-- Ambient Vignette & Information Overlay -->
+      <div class="absolute inset-0 bg-gradient-to-t from-luxury-base/95 via-luxury-base/30 to-transparent flex flex-col justify-between p-4 pointer-events-none">
+        <!-- Top Monogram Badge -->
+        <div class="flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-luxury-taupe">
+          <span class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-luxury-base/70 backdrop-blur-sm border border-luxury-taupe/30">
+            <Film class="w-3 h-3 text-luxury-taupe" />
+            <span>35mm</span>
+          </span>
+          <span class="w-6 h-6 rounded-full bg-luxury-base/70 backdrop-blur-sm border border-luxury-taupe/30 flex items-center justify-center text-luxury-cream group-hover:bg-luxury-crimson group-hover:text-luxury-cream group-hover:border-luxury-crimson transition-all duration-300">
+            <ArrowUpRight class="w-3.5 h-3.5" />
+          </span>
+        </div>
+
+        <!-- Bottom Category Title & Meta -->
+        <div class="text-left">
+          <h2 class="font-serif text-xl sm:text-2xl text-luxury-cream font-normal tracking-tight drop-shadow-md">
+            <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{titleEn}</span>
+            <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{titleRu}</span>
+          </h2>
+          <div class="flex items-center justify-between mt-1 text-[10px] font-mono uppercase tracking-widest text-luxury-taupe border-t border-luxury-taupe/20 pt-1.5">
+            <span>
+              <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('deck.viewSeries')}</span>
+              <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('deck.viewSeries')}</span>
+            </span>
+            {totalExposures > 0 && (
+              <span class="text-luxury-taupe/80">
+                {totalExposures}{' '}
+                <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('deck.exposures')}</span>
+                <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('deck.exposures')}</span>
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</a>

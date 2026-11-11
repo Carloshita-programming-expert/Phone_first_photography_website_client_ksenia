@@ -1,0 +1,98 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CategoryDeck from '../components/CategoryDeck.astro';
+import { client } from '../../tina/__generated__/client';
+import { useTranslations } from '../i18n/ui';
+
+const currentLang = (Astro.url.searchParams.get('lang') as 'en' | 'ru') || 'en';
+
+const t = useTranslations(currentLang);
+const tEn = useTranslations('en');
+const tRu = useTranslations('ru');
+
+let posts: any[] = [];
+try {
+  if (typeof client.queries.photoshootsConnection === 'function') {
+    const response = await client.queries.photoshootsConnection();
+    posts = response?.data?.photoshootsConnection?.edges?.map((edge: any) => edge?.node).filter(Boolean) || [];
+  }
+} catch (_err) {
+  // Graceful fallback during build
+}
+
+// Defined core categories
+const CATEGORIES = [
+  {
+    key: 'Portraiture' as const,
+    titleEn: tEn('category.portraiture'),
+    titleRu: tRu('category.portraiture'),
+  },
+  {
+    key: 'Editorial' as const,
+    titleEn: tEn('category.editorial'),
+    titleRu: tRu('category.editorial'),
+  },
+  {
+    key: 'Love Story' as const,
+    titleEn: tEn('category.loveStory'),
+    titleRu: tRu('category.loveStory'),
+  },
+  {
+    key: 'Documentary' as const,
+    titleEn: tEn('category.documentary'),
+    titleRu: tRu('category.documentary'),
+  },
+];
+
+// Helper to gather images and exposure count per category
+const categoryData = CATEGORIES.map((cat) => {
+  const matchingPosts = posts.filter(
+    (p) => (p.category || 'Editorial').toLowerCase() === cat.key.toLowerCase()
+  );
+  const images = matchingPosts.flatMap((p) => (p.images || []).filter(Boolean) as string[]);
+  return {
+    ...cat,
+    images,
+    totalExposures: images.length,
+  };
+});
+---
+
+<Layout
+  title={t('portfolio.title')}
+  description={t('portfolio.description')}
+  currentLang={currentLang}
+  activeTab="portfolio"
+>
+  <div class="w-full px-4 sm:px-6 py-6 overflow-x-clip">
+    <!-- Editorial Header -->
+    <header class="mb-8 sm:mb-12 text-center max-w-xl mx-auto">
+      <span class="text-[10px] font-mono uppercase tracking-[0.25em] text-luxury-taupe">
+        <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('portfolio.tag')}</span>
+        <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('portfolio.tag')}</span>
+      </span>
+      <h1 class="font-serif text-3xl sm:text-4xl text-luxury-cream tracking-tight font-normal mt-2">
+        <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('portfolio.heading')}</span>
+        <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('portfolio.heading')}</span>
+      </h1>
+      <p class="text-xs sm:text-sm text-luxury-taupe max-w-md mx-auto mt-2.5 font-light leading-relaxed">
+        <span data-i18n-lang="en" class={currentLang === 'ru' ? 'hidden' : ''}>{tEn('portfolio.desc')}</span>
+        <span data-i18n-lang="ru" class={currentLang === 'en' ? 'hidden' : ''}>{tRu('portfolio.desc')}</span>
+      </p>
+    </header>
+
+    <!-- 4 Decks Grid (Deck of Cards UI) -->
+    <div class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-10 lg:gap-12 pb-12">
+      {categoryData.map((deck) => (
+        <CategoryDeck
+          category={deck.key}
+          titleEn={deck.titleEn}
+          titleRu={deck.titleRu}
+          images={deck.images}
+          totalExposures={deck.totalExposures}
+          currentLang={currentLang}
+        />
+      ))}
+    </div>
+  </div>
+</Layout>
