@@ -24,6 +24,7 @@ function getLocalPhotoshoots() {
         id: data.id || file.replace(".json", ""),
         title: data.title || "",
         title_ru: data.title_ru || "",
+        category: data.category || "Editorial",
         location: data.location || "",
         camera: data.camera || "",
         date: data.date || "",
