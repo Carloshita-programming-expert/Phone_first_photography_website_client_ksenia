@@ -131,9 +131,37 @@ const resolvedActiveTab: 'home' | 'grid' | 'about' =
   function setupLanguageToggle() {
     const buttons = document.querySelectorAll<HTMLButtonElement>('[data-lang-btn]');
     const url = new URL(window.location.href);
-    const initialLang = (url.searchParams.get('lang') as 'en' | 'ru') || 'en';
+    let storedLang: string | null = null;
+    try {
+      storedLang = localStorage.getItem('ksenia_lang');
+    } catch (_e) {}
+    const initialLang = (url.searchParams.get('lang') as 'en' | 'ru') || (storedLang as 'en' | 'ru') || 'en';
 
     function setLanguage(lang: 'en' | 'ru') {
+      try {
+        localStorage.setItem('ksenia_lang', lang);
+      } catch (_e) {}
+
+      document.documentElement.lang = lang;
+      document.documentElement.setAttribute('data-current-lang', lang);
+
+      // Handle FOUC guard style tag
+      const foucGuard = document.getElementById('ksenia-i18n-fouc-guard');
+      if (lang === 'ru') {
+        if (!foucGuard) {
+          const style = document.createElement('style');
+          style.id = 'ksenia-i18n-fouc-guard';
+          style.textContent =
+            '[data-i18n-lang="en"], [data-title-lang="en"], [data-caption-lang="en"], [data-bio-lang="en"] { display: none !important; }' +
+            '[data-i18n-lang="ru"], [data-title-lang="ru"], [data-caption-lang="ru"], [data-bio-lang="ru"] { display: revert !important; }';
+          document.head.appendChild(style);
+        }
+      } else {
+        if (foucGuard) {
+          foucGuard.remove();
+        }
+      }
+
       buttons.forEach((btn) => {
         const btnLang = btn.getAttribute('data-lang-btn');
         const isActive = btnLang === lang;

@@ -44,6 +44,33 @@ const resolvedDescription = description || t('layout.description');
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>{resolvedTitle}</title>
+
+    <!-- Client-side i18n Language State Persistence (Pre-DOM Paint FOUC Guard) -->
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem('ksenia_lang');
+          var urlParams = new URLSearchParams(window.location.search);
+          var urlLang = urlParams.get('lang');
+          var activeLang = urlLang || stored || 'en';
+
+          if (stored !== activeLang) {
+            localStorage.setItem('ksenia_lang', activeLang);
+          }
+          document.documentElement.lang = activeLang;
+          document.documentElement.setAttribute('data-current-lang', activeLang);
+
+          if (activeLang === 'ru') {
+            var style = document.createElement('style');
+            style.id = 'ksenia-i18n-fouc-guard';
+            style.textContent =
+              '[data-i18n-lang="en"], [data-title-lang="en"], [data-caption-lang="en"], [data-bio-lang="en"] { display: none !important; }' +
+              '[data-i18n-lang="ru"], [data-title-lang="ru"], [data-caption-lang="ru"], [data-bio-lang="ru"] { display: revert !important; }';
+            document.head.appendChild(style);
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body class="min-h-screen bg-luxury-base text-luxury-cream overflow-x-hidden selection:bg-luxury-crimson selection:text-luxury-cream flex flex-col justify-between">
     <!-- Desktop Ambient Background Elements -->
