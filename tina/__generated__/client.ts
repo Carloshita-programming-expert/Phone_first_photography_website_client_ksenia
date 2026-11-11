@@ -15,34 +15,38 @@ function getLocalPhotoshoots() {
   if (!fs.existsSync(contentDir)) return [];
   const files = fs.readdirSync(contentDir).filter((f) => f.endsWith(".json"));
   return files.map((file) => {
-    const raw = fs.readFileSync(path.join(contentDir, file), "utf-8");
-    const data = JSON.parse(raw);
-    return {
-      cursor: file,
-      node: {
-        __typename: "Photoshoots" as const,
-        id: data.id || file.replace(".json", ""),
-        title: data.title || "",
-        title_ru: data.title_ru || "",
-        category: data.category || "Editorial",
-        location: data.location || "",
-        camera: data.camera || "",
-        date: data.date || "",
-        images: data.images || [],
-        caption_en: data.caption_en || "",
-        caption_ru: data.caption_ru || "",
-        _sys: {
-          filename: file.replace(".json", ""),
-          basename: file,
-          hasReferences: false,
-          breadcrumbs: [file.replace(".json", "")],
-          path: `content/photoshoots/${file}`,
-          relativePath: file,
-          extension: ".json",
+    try {
+      const raw = fs.readFileSync(path.join(contentDir, file), "utf-8");
+      const data = JSON.parse(raw);
+      return {
+        cursor: file,
+        node: {
+          __typename: "Photoshoots" as const,
+          id: data.id || file.replace(".json", ""),
+          title: data.title || "",
+          title_ru: data.title_ru || "",
+          category: data.category || "Uncategorized",
+          location: data.location || "",
+          camera: data.camera || "",
+          date: data.date || "",
+          images: Array.isArray(data.images) ? data.images : [],
+          caption_en: data.caption_en || "",
+          caption_ru: data.caption_ru || "",
+          _sys: {
+            filename: file.replace(".json", ""),
+            basename: file,
+            hasReferences: false,
+            breadcrumbs: [file.replace(".json", "")],
+            path: `content/photoshoots/${file}`,
+            relativePath: file,
+            extension: ".json",
+          },
         },
-      },
-    };
-  });
+      };
+    } catch (_err) {
+      return null;
+    }
+  }).filter(Boolean);
 }
 
 function getLocalProfile() {
@@ -50,37 +54,44 @@ function getLocalProfile() {
   if (!fs.existsSync(contentDir)) return null;
   const files = fs.readdirSync(contentDir).filter((f) => f.endsWith(".json"));
   if (files.length === 0) return null;
-  const raw = fs.readFileSync(path.join(contentDir, files[0]), "utf-8");
-  const data = JSON.parse(raw);
-  return {
-    cursor: files[0],
-    node: {
-      __typename: "Global_profile" as const,
-      id: "ksenia",
-      name: data.name || "Ksenia",
-      bio_en: data.bio_en || "",
-      bio_ru: data.bio_ru || "",
-      email: data.email || "",
-      portrait: data.portrait || data.profile_image || "",
-      profile_image: data.portrait || data.profile_image || "",
-      _sys: {
-        filename: files[0].replace(".json", ""),
-        basename: files[0],
-        hasReferences: false,
-        breadcrumbs: [files[0].replace(".json", "")],
-        path: `content/profile/${files[0]}`,
-        relativePath: files[0],
-        extension: ".json",
+  try {
+    const raw = fs.readFileSync(path.join(contentDir, files[0]), "utf-8");
+    const data = JSON.parse(raw);
+    return {
+      cursor: files[0],
+      node: {
+        __typename: "Global_profile" as const,
+        id: "ksenia",
+        name: data.name || "Ksenia",
+        bio_en: data.bio_en || "",
+        bio_ru: data.bio_ru || "",
+        email: data.email || "",
+        portrait: data.portrait || data.profile_image || "",
+        profile_image: data.portrait || data.profile_image || "",
+        _sys: {
+          filename: files[0].replace(".json", ""),
+          basename: files[0],
+          hasReferences: false,
+          breadcrumbs: [files[0].replace(".json", "")],
+          path: `content/profile/${files[0]}`,
+          relativePath: files[0],
+          extension: ".json",
+        },
       },
-    },
-  };
+    };
+  } catch (_err) {
+    return null;
+  }
 }
 
 const originalPhotoshootsConnection = baseClient.queries.photoshootsConnection?.bind(baseClient.queries);
 baseClient.queries.photoshootsConnection = async (args?: any, options?: any) => {
   try {
     if (originalPhotoshootsConnection) {
-      return await originalPhotoshootsConnection(args, options);
+      const res = await originalPhotoshootsConnection(args, options);
+      if (res?.data?.photoshootsConnection?.edges?.length) {
+        return res;
+      }
     }
   } catch (_err) {
     // fallback to local content
@@ -110,10 +121,16 @@ const originalProfileConnection = (baseClient.queries as any).profileConnection?
 const profileQueryHandler = async (args?: any, options?: any) => {
   try {
     if (originalGlobalProfileConnection) {
-      return await originalGlobalProfileConnection(args, options);
+      const res = await originalGlobalProfileConnection(args, options);
+      if (res?.data?.global_profileConnection?.edges?.length || res?.data?.global_profile) {
+        return res;
+      }
     }
     if (originalProfileConnection) {
-      return await originalProfileConnection(args, options);
+      const res = await originalProfileConnection(args, options);
+      if (res?.data?.profileConnection?.edges?.length || res?.data?.profile) {
+        return res;
+      }
     }
   } catch (_err) {
     // fallback to local content

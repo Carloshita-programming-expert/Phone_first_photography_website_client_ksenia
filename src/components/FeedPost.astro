@@ -11,6 +11,7 @@ export interface Props {
   id: string | number;
   title: string;
   title_ru?: string;
+  category?: string;
   location: string;
   images: string[];
   captions: Captions;
@@ -23,6 +24,7 @@ const {
   id,
   title,
   title_ru,
+  category = 'Uncategorized',
   location,
   images = [],
   captions = { en: '', ru: '' },
@@ -59,9 +61,14 @@ const postId = `post-${id}`;
       </div>
     </div>
 
-    <!-- Series metadata tag -->
-    <div class="text-[10px] uppercase font-mono tracking-wider px-2 py-0.5 rounded bg-luxury-base text-luxury-taupe border border-luxury-taupe/30">
-      {camera}
+    <!-- Series metadata tag & Category badge -->
+    <div class="flex items-center space-x-1.5">
+      <span class="text-[10px] uppercase font-mono tracking-wider px-2 py-0.5 rounded bg-luxury-base text-luxury-taupe border border-luxury-taupe/30">
+        {category}
+      </span>
+      <span class="hidden sm:inline-block text-[10px] uppercase font-mono tracking-wider px-2 py-0.5 rounded bg-luxury-base text-luxury-taupe/70 border border-luxury-taupe/20">
+        {camera}
+      </span>
     </div>
   </header>
 

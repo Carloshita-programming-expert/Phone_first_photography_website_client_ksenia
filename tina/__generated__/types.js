@@ -10,6 +10,7 @@ export const PhotoshootsPartsFragmentDoc = gql`
   __typename
   title
   title_ru
+  category
   location
   camera
   date
@@ -178,7 +179,7 @@ const generateRequester = (client) => {
 export const ExperimentalGetTinaClient = () => getSdk(
   generateRequester(
     createClient({
-      url: "http://localhost:4001/graphql",
+      url: "https://content.tinajs.io/4.1/content/dummy/github/main",
       queries
     })
   )

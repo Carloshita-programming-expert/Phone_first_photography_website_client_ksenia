@@ -21,6 +21,39 @@ try {
   // Graceful fallback during build
 }
 
+// Resilient fallback: ensure all photoshoots render by default if GraphQL query returns empty
+if (!posts || posts.length === 0) {
+  try {
+    const photoshootModules = import.meta.glob('../../content/photoshoots/*.json', { eager: true });
+    posts = Object.entries(photoshootModules).map(([filePath, mod]: [string, any]) => {
+      const data = mod?.default || mod;
+      const filename = filePath.split('/').pop()?.replace('.json', '') || 'post';
+      return {
+        id: data.id || filename,
+        ...data,
+        _sys: { filename },
+      };
+    });
+  } catch (_fallbackErr) {
+    // Keep empty if unavailable
+  }
+}
+
+// Sanitize and ensure safe category fallback defaults for every photoshoot item
+const sanitizedPosts = posts.map((post: any) => ({
+  ...post,
+  id: post?.id || post?._sys?.filename || 'shoot',
+  title: post?.title || 'Untitled Series',
+  title_ru: post?.title_ru || post?.title || 'Безымянная серия',
+  category: (post?.category && typeof post.category === 'string' && post.category.trim() !== '') ? post.category : 'Uncategorized',
+  location: post?.location || 'Unknown Location',
+  camera: post?.camera || '35mm Film',
+  date: post?.date || '',
+  images: (Array.isArray(post?.images) ? post.images : []).filter(Boolean) as string[],
+  caption_en: post?.caption_en || '',
+  caption_ru: post?.caption_ru || '',
+}));
+
 const filterCategories = [
   { key: 'all', labelEn: tEn('category.all'), labelRu: tRu('category.all') },
   { key: 'Portraiture', labelEn: tEn('category.portraiture'), labelRu: tRu('category.portraiture') },
@@ -66,24 +99,29 @@ const filterCategories = [
       </div>
     </header>
 
-    <MasonryGrid posts={posts} />
+    <MasonryGrid posts={sanitizedPosts} />
     <Lightbox currentLang={currentLang} />
   </div>
 
   <script>
     function setupCollageCategoryFilter() {
       const url = new URL(window.location.href);
-      const initialCategory = url.searchParams.get('category');
+      // Strictly check if ?category= parameter is present and non-empty
+      const rawCategoryParam = url.searchParams.get('category');
+      const hasCategoryParam = rawCategoryParam !== null && rawCategoryParam.trim() !== '';
+
       const buttons = document.querySelectorAll<HTMLButtonElement>('[data-filter-category]');
       const cards = document.querySelectorAll<HTMLElement>('[data-masonry-card]');
 
-      function filterToCategory(cat: string | null) {
-        const activeKey = cat && cat.toLowerCase() !== 'all' ? cat.toLowerCase() : 'all';
+      function applyFilter(categoryFilter: string | null, updateUrl: boolean = false) {
+        // Strict category filtering ONLY applies when categoryFilter is provided, non-empty, and not 'all'
+        const isStrictFilterActive = Boolean(categoryFilter && categoryFilter.toLowerCase() !== 'all');
+        const activeFilterKey = isStrictFilterActive ? categoryFilter!.toLowerCase() : 'all';
 
         // Update button active styling
         buttons.forEach((btn) => {
           const btnCat = (btn.getAttribute('data-filter-category') || '').toLowerCase();
-          const isActive = btnCat === activeKey;
+          const isActive = btnCat === activeFilterKey;
           if (isActive) {
             btn.classList.add('bg-luxury-crimson', 'text-luxury-cream', 'border-luxury-crimson', 'font-semibold', 'shadow-sm');
             btn.classList.remove('text-luxury-taupe', 'hover:text-luxury-cream', 'border-luxury-taupe/30');
@@ -93,35 +131,48 @@ const filterCategories = [
           }
         });
 
-        // Filter masonry cards
+        // Filter masonry cards:
+        // When strict filter is NOT active, strictly render ALL cards by default (including 'Uncategorized')
         cards.forEach((card) => {
-          const cardCat = (card.getAttribute('data-category') || '').toLowerCase();
-          if (activeKey === 'all' || cardCat === activeKey) {
+          if (!isStrictFilterActive) {
+            // Render all photoshoots by default without dropping anything
             card.classList.remove('hidden');
           } else {
-            card.classList.add('hidden');
+            // Strict category filtering
+            const cardCat = (card.getAttribute('data-category') || 'uncategorized').toLowerCase();
+            if (cardCat === activeFilterKey) {
+              card.classList.remove('hidden');
+            } else {
+              card.classList.add('hidden');
+            }
           }
         });
 
-        // Update URL query parameter
-        const nextUrl = new URL(window.location.href);
-        if (activeKey === 'all') {
-          nextUrl.searchParams.delete('category');
-        } else {
-          nextUrl.searchParams.set('category', cat!);
+        // Update URL query parameter only upon user interactive button click
+        if (updateUrl) {
+          const nextUrl = new URL(window.location.href);
+          if (isStrictFilterActive) {
+            nextUrl.searchParams.set('category', categoryFilter!);
+          } else {
+            nextUrl.searchParams.delete('category');
+          }
+          window.history.replaceState({}, '', nextUrl.toString());
         }
-        window.history.replaceState({}, '', nextUrl.toString());
       }
 
       buttons.forEach((btn) => {
         btn.addEventListener('click', () => {
           const cat = btn.getAttribute('data-filter-category');
-          filterToCategory(cat);
+          applyFilter(cat, true);
         });
       });
 
-      // Run filter on initial page load based on ?category= parameter
-      filterToCategory(initialCategory);
+      // Strict category filtering ONLY applies when the URL parameter ?category= is actively present
+      if (hasCategoryParam) {
+        applyFilter(rawCategoryParam, false);
+      } else {
+        applyFilter('all', false);
+      }
     }
 
     setupCollageCategoryFilter();

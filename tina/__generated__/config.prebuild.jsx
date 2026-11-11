@@ -37,6 +37,20 @@ var config_default = defineConfig({
           },
           {
             type: "string",
+            name: "category",
+            label: "Category",
+            options: [
+              "Portraiture",
+              "Editorial",
+              "Love Story",
+              "Documentary"
+            ],
+            ui: {
+              component: "select"
+            }
+          },
+          {
+            type: "string",
             name: "location",
             label: "Location",
             required: true

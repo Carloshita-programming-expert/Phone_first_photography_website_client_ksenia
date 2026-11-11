@@ -96,6 +96,7 @@ union DocumentNode = Photoshoots | Global_profile | Folder
 type Photoshoots implements Node & Document {
   title: String!
   title_ru: String
+  category: String
   location: String!
   camera: String
   date: String
@@ -117,6 +118,7 @@ input StringFilter {
 input PhotoshootsFilter {
   title: StringFilter
   title_ru: StringFilter
+  category: StringFilter
   location: StringFilter
   camera: StringFilter
   date: StringFilter
@@ -192,6 +194,7 @@ input DocumentMutation {
 input PhotoshootsMutation {
   title: String
   title_ru: String
+  category: String
   location: String
   camera: String
   date: String

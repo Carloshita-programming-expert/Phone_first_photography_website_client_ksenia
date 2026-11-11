@@ -7,6 +7,7 @@ export interface PostItem {
   id?: string;
   title?: string;
   title_ru?: string;
+  category?: string;
   location?: string;
   camera?: string;
   date?: string;
@@ -29,9 +30,11 @@ const tRu = useTranslations('ru');
 // Flatten all images into a sequenced filmstrip series
 const filmstripFrames = posts.flatMap((post, postIdx) => {
   const images = (post.images || []).filter(Boolean) as string[];
+  const category = (post.category && typeof post.category === 'string' && post.category.trim() !== '') ? post.category : 'Uncategorized';
   return images.map((imgId, imgIdx) => ({
     frameId: `${post.id || postIdx}-${imgIdx}`,
     imgId,
+    category,
     titleEn: post.title || 'Untitled Series',
     titleRu: post.title_ru || post.title || 'Безымянная серия',
     location: post.location || 'Unknown Location',

@@ -189,6 +189,7 @@ export type Photoshoots = Node & Document & {
   __typename?: 'Photoshoots';
   title: Scalars['String']['output'];
   title_ru?: Maybe<Scalars['String']['output']>;
+  category?: Maybe<Scalars['String']['output']>;
   location: Scalars['String']['output'];
   camera?: Maybe<Scalars['String']['output']>;
   date?: Maybe<Scalars['String']['output']>;
@@ -210,6 +211,7 @@ export type StringFilter = {
 export type PhotoshootsFilter = {
   title?: InputMaybe<StringFilter>;
   title_ru?: InputMaybe<StringFilter>;
+  category?: InputMaybe<StringFilter>;
   location?: InputMaybe<StringFilter>;
   camera?: InputMaybe<StringFilter>;
   date?: InputMaybe<StringFilter>;
@@ -348,6 +350,7 @@ export type DocumentMutation = {
 export type PhotoshootsMutation = {
   title?: InputMaybe<Scalars['String']['input']>;
   title_ru?: InputMaybe<Scalars['String']['input']>;
+  category?: InputMaybe<Scalars['String']['input']>;
   location?: InputMaybe<Scalars['String']['input']>;
   camera?: InputMaybe<Scalars['String']['input']>;
   date?: InputMaybe<Scalars['String']['input']>;
@@ -374,6 +377,7 @@ export type StringFilter = {
 export type PhotoshootsFilter = {
   title?: StringFilter | null | undefined;
   title_ru?: StringFilter | null | undefined;
+  category?: StringFilter | null | undefined;
   location?: StringFilter | null | undefined;
   camera?: StringFilter | null | undefined;
   date?: StringFilter | null | undefined;
@@ -390,7 +394,7 @@ export type Global_ProfileFilter = {
   portrait?: StringFilter | null | undefined;
 };
 
-export type PhotoshootsPartsFragment = { __typename: 'Photoshoots', title: string, title_ru: string | null, location: string, camera: string | null, date: string | null, images: Array<string | null> | null, caption_en: string | null, caption_ru: string | null };
+export type PhotoshootsPartsFragment = { __typename: 'Photoshoots', title: string, title_ru: string | null, category: string | null, location: string, camera: string | null, date: string | null, images: Array<string | null> | null, caption_en: string | null, caption_ru: string | null };
 
 export type Global_ProfilePartsFragment = { __typename: 'Global_profile', name: string, bio_en: string | null, bio_ru: string | null, email: string | null, portrait: string | null };
 
@@ -399,7 +403,7 @@ export type PhotoshootsQueryVariables = Exact<{
 }>;
 
 
-export type PhotoshootsQuery = { photoshoots: { __typename: 'Photoshoots', id: string, title: string, title_ru: string | null, location: string, camera: string | null, date: string | null, images: Array<string | null> | null, caption_en: string | null, caption_ru: string | null, _sys: { filename: string, basename: string, hasReferences: boolean | null, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
+export type PhotoshootsQuery = { photoshoots: { __typename: 'Photoshoots', id: string, title: string, title_ru: string | null, category: string | null, location: string, camera: string | null, date: string | null, images: Array<string | null> | null, caption_en: string | null, caption_ru: string | null, _sys: { filename: string, basename: string, hasReferences: boolean | null, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
 
 export type PhotoshootsConnectionQueryVariables = Exact<{
   before?: string | null | undefined;
@@ -411,7 +415,7 @@ export type PhotoshootsConnectionQueryVariables = Exact<{
 }>;
 
 
-export type PhotoshootsConnectionQuery = { photoshootsConnection: { totalCount: number, pageInfo: { hasPreviousPage: boolean, hasNextPage: boolean, startCursor: string, endCursor: string }, edges: Array<{ cursor: string, node: { __typename: 'Photoshoots', id: string, title: string, title_ru: string | null, location: string, camera: string | null, date: string | null, images: Array<string | null> | null, caption_en: string | null, caption_ru: string | null, _sys: { filename: string, basename: string, hasReferences: boolean | null, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | null } | null> | null } };
+export type PhotoshootsConnectionQuery = { photoshootsConnection: { totalCount: number, pageInfo: { hasPreviousPage: boolean, hasNextPage: boolean, startCursor: string, endCursor: string }, edges: Array<{ cursor: string, node: { __typename: 'Photoshoots', id: string, title: string, title_ru: string | null, category: string | null, location: string, camera: string | null, date: string | null, images: Array<string | null> | null, caption_en: string | null, caption_ru: string | null, _sys: { filename: string, basename: string, hasReferences: boolean | null, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | null } | null> | null } };
 
 export type Global_ProfileQueryVariables = Exact<{
   relativePath: string;
@@ -437,6 +441,7 @@ export const PhotoshootsPartsFragmentDoc = gql`
   __typename
   title
   title_ru
+  category
   location
   camera
   date
@@ -631,7 +636,7 @@ export const ExperimentalGetTinaClient = () =>
   getSdk(
     generateRequester(
       createClient({
-        url: "http://localhost:4001/graphql",
+        url: "https://content.tinajs.io/4.1/content/dummy/github/main",
         queries,
       })
     )

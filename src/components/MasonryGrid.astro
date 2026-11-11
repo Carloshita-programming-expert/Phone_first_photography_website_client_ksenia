@@ -25,12 +25,13 @@ const { posts = [] } = Astro.props;
 // Flatten all images into a unified collection of curated photographs with metadata
 const allPhotos = posts.flatMap((post) => {
   const images = (post.images || []).filter(Boolean) as string[];
+  const category = (post.category && typeof post.category === 'string' && post.category.trim() !== '') ? post.category : 'Uncategorized';
   return images.map((imgId, idx) => ({
     id: `${post.id || post._sys?.filename || 'shoot'}-${idx}`,
     imgId,
     title: post.title || 'Untitled Series',
     title_ru: post.title_ru || post.title || 'Безымянная серия',
-    category: post.category || 'Editorial',
+    category: category,
     location: post.location || 'Unknown Location',
     camera: post.camera || '35mm Film',
     date: post.date || '',

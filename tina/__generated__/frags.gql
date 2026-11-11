@@ -2,6 +2,7 @@ fragment PhotoshootsParts on Photoshoots {
   __typename
   title
   title_ru
+  category
   location
   camera
   date

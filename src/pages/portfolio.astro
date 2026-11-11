@@ -20,6 +20,39 @@ try {
   // Graceful fallback during build
 }
 
+// Resilient fallback: ensure all photoshoots render by default if GraphQL query returns empty
+if (!posts || posts.length === 0) {
+  try {
+    const photoshootModules = import.meta.glob('../../content/photoshoots/*.json', { eager: true });
+    posts = Object.entries(photoshootModules).map(([filePath, mod]: [string, any]) => {
+      const data = mod?.default || mod;
+      const filename = filePath.split('/').pop()?.replace('.json', '') || 'post';
+      return {
+        id: data.id || filename,
+        ...data,
+        _sys: { filename },
+      };
+    });
+  } catch (_fallbackErr) {
+    // Keep empty if unavailable
+  }
+}
+
+// Sanitize and ensure safe category fallback defaults for every photoshoot item
+const sanitizedPosts = posts.map((post: any) => ({
+  ...post,
+  id: post?.id || post?._sys?.filename || 'shoot',
+  title: post?.title || 'Untitled Series',
+  title_ru: post?.title_ru || post?.title || 'Безымянная серия',
+  category: (post?.category && typeof post.category === 'string' && post.category.trim() !== '') ? post.category : 'Uncategorized',
+  location: post?.location || 'Unknown Location',
+  camera: post?.camera || '35mm Film',
+  date: post?.date || '',
+  images: (Array.isArray(post?.images) ? post.images : []).filter(Boolean) as string[],
+  caption_en: post?.caption_en || '',
+  caption_ru: post?.caption_ru || '',
+}));
+
 // Defined core categories
 const CATEGORIES = [
   {
@@ -46,8 +79,8 @@ const CATEGORIES = [
 
 // Helper to gather images and exposure count per category
 const categoryData = CATEGORIES.map((cat) => {
-  const matchingPosts = posts.filter(
-    (p) => (p.category || 'Editorial').toLowerCase() === cat.key.toLowerCase()
+  const matchingPosts = sanitizedPosts.filter(
+    (p) => (p.category || 'Uncategorized').toLowerCase() === cat.key.toLowerCase()
   );
   const images = matchingPosts.flatMap((p) => (p.images || []).filter(Boolean) as string[]);
   return {
