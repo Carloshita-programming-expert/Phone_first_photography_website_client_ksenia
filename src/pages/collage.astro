@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import MasonryGrid from '../components/MasonryGrid.astro';
+import Lightbox from '../components/Lightbox.astro';
 import { client } from '../../tina/__generated__/client';
 import { useTranslations } from '../i18n/ui';
 
@@ -44,5 +45,6 @@ try {
     </header>
 
     <MasonryGrid posts={posts} />
+    <Lightbox currentLang={currentLang} />
   </div>
 </Layout>

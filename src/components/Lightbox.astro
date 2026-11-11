@@ -1,0 +1,130 @@
+---
+import { X } from 'lucide-astro';
+import { useTranslations } from '../i18n/ui';
+
+interface Props {
+  currentLang?: 'en' | 'ru';
+}
+
+const { currentLang = 'en' } = Astro.props;
+const tEn = useTranslations('en');
+const tRu = useTranslations('ru');
+---
+
+<div
+  id="collage-lightbox"
+  class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-luxury-base/90 backdrop-blur-2xl opacity-0 pointer-events-none transition-all duration-300 select-none"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Image Lightbox Modal"
+  tabindex="-1"
+>
+  <!-- Dismissal Button (X) -->
+  <button
+    id="lightbox-close-btn"
+    type="button"
+    class="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 p-2.5 rounded-full bg-luxury-base/80 border border-luxury-taupe/30 text-luxury-cream hover:text-luxury-cream hover:bg-luxury-crimson hover:border-luxury-crimson transition-all active:scale-95 cursor-pointer shadow-lg"
+    aria-label={currentLang === 'ru' ? tRu('lightbox.close') : tEn('lightbox.close')}
+  >
+    <X class="w-6 h-6 stroke-[2]" />
+  </button>
+
+  <!-- Modal Content Container -->
+  <div class="relative max-w-full max-h-full flex items-center justify-center">
+    <img
+      id="lightbox-img"
+      src=""
+      alt=""
+      class="max-w-[92vw] max-h-[88vh] sm:max-w-[85vw] sm:max-h-[85vh] object-contain rounded shadow-2xl transition-transform duration-300 scale-95"
+    />
+  </div>
+</div>
+
+<script>
+  function setupLightbox() {
+    const lightbox = document.getElementById('collage-lightbox');
+    const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement | null;
+    const closeBtn = document.getElementById('lightbox-close-btn');
+
+    if (!lightbox || !lightboxImg) return;
+
+    let isOpen = false;
+
+    // Escape key handler: explicitly attached on open, removed on close
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        closeLightbox();
+      }
+    };
+
+    function openLightbox(src: string, alt = '') {
+      if (!lightbox || !lightboxImg) return;
+      lightboxImg.src = src;
+      lightboxImg.alt = alt;
+
+      // Make visible and interactive
+      lightbox.classList.remove('opacity-0', 'pointer-events-none');
+      lightbox.classList.add('opacity-100', 'pointer-events-auto');
+      lightboxImg.classList.remove('scale-95');
+      lightboxImg.classList.add('scale-100');
+
+      // UX: Apply overflow hidden to document.body to lock background scroll
+      document.body.style.overflow = 'hidden';
+      isOpen = true;
+
+      // Attach Escape key listener only while modal is open
+      window.addEventListener('keydown', onKeyDown);
+      lightbox.focus();
+    }
+
+    function closeLightbox() {
+      if (!lightbox || !lightboxImg || !isOpen) return;
+
+      // Hide modal
+      lightbox.classList.remove('opacity-100', 'pointer-events-auto');
+      lightbox.classList.add('opacity-0', 'pointer-events-none');
+      lightboxImg.classList.remove('scale-100');
+      lightboxImg.classList.add('scale-95');
+
+      // Restore body scroll
+      document.body.style.overflow = '';
+      isOpen = false;
+
+      // Remove Escape key event listener to prevent leaks
+      window.removeEventListener('keydown', onKeyDown);
+    }
+
+    // Dismissal Method 1: Clicking the "X" button
+    closeBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeLightbox();
+    });
+
+    // Dismissal Method 2: Clicking anywhere on the blurred backdrop outside the image
+    lightbox.addEventListener('click', (e) => {
+      if (e.target !== lightboxImg && !lightboxImg.contains(e.target as Node)) {
+        closeLightbox();
+      }
+    });
+
+    // Trigger: Attach click listeners to all masonry grid images / cards
+    const triggers = document.querySelectorAll<HTMLElement>('[data-lightbox-trigger]');
+    triggers.forEach((trigger) => {
+      trigger.addEventListener('click', () => {
+        const src = trigger.dataset.lightboxSrc;
+        const alt = trigger.dataset.lightboxAlt || '';
+        if (src) {
+          openLightbox(src, alt);
+        }
+      });
+    });
+
+    // Cleanup on view transitions
+    document.addEventListener('astro:before-swap', () => {
+      closeLightbox();
+    }, { once: true });
+  }
+
+  setupLightbox();
+  document.addEventListener('astro:page-load', setupLightbox);
+</script>
